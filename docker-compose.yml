@@ -1,0 +1,44 @@
+version: "3.9"
+
+volumes:
+  letsgovolume:
+    name: letsgo-volume
+
+networks:
+  letsgonetwork:
+    name: letsgo-network
+
+services:
+  pg:
+    image: postgres:latest
+    container_name: pg_letsgo
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - letsgovolume:/var/lib/postgresql/data
+      - ./scripts/db:/docker-entrypoint-initdb.d/
+    networks:
+      - letsgonetwork
+  letsgo_app:
+    container_name: letsgo_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        API_PORT: ${API_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - pg
+    volumes:
+      - ./:/app
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - letsgonetwork
+    env_file:
+      - .env
+    entrypoint: ["/bin/bash", "./scripts/entrypoint.sh"]
