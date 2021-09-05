@@ -2,10 +2,20 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+type Recipe struct {
+	ID           string    `json:"ID"`
+	Name         string    `json:"Name"`
+	Tags         []string  `json:"Tags"`
+	Ingredients  []string  `json:"Ingredients"`
+	Instructions []string  `json:"Instructions"`
+	PublishedAt  time.Time `json:"PublishedAt"`
+}
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
