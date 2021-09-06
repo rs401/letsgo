@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -26,6 +28,8 @@ func init() {
 		panic("Error loading .env file")
 	}
 	recipes = make([]Recipe, 0)
+	file, _ := ioutil.ReadFile("./recipes.json")
+	_ = json.Unmarshal([]byte(file), &recipes)
 }
 
 func Config(key string) string {
@@ -52,11 +56,16 @@ func NewRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
+func ListRecipesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
+}
+
 func main() {
 	port := Config("API_PORT")
 	r := gin.Default()
 	r.GET("/", IndexHandler)
 	r.POST("/recipes", NewRecipeHandler)
+	r.GET("/recipes", ListRecipesHandler)
 
 	r.Run(":" + port)
 }
