@@ -21,13 +21,13 @@ type Recipe struct {
 	PublishedAt  time.Time `json:"PublishedAt"`
 }
 
-var recipes []Recipe
+var recipes map[string]Recipe
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
 		panic("Error loading .env file")
 	}
-	recipes = make([]Recipe, 0)
+	recipes = make(map[string]Recipe)
 	file, _ := ioutil.ReadFile("./recipes.json")
 	_ = json.Unmarshal([]byte(file), &recipes)
 }
@@ -52,7 +52,8 @@ func NewRecipeHandler(c *gin.Context) {
 	}
 	recipe.ID = xid.New().String()
 	recipe.PublishedAt = time.Now()
-	recipes = append(recipes, recipe)
+	recipes[recipe.ID] = recipe
+	// recipes = append(recipes, recipe)
 	c.JSON(http.StatusOK, recipe)
 }
 
@@ -70,20 +71,28 @@ func UpdateRecipeHandler(c *gin.Context) {
 		})
 		return
 	}
-	index := -1
-	for i := 0; i < len(recipes); i++ {
-		if recipes[i].ID == id {
-			index = i
-		}
-	}
-	if index == -1 {
+	if tmpRecipe := recipes[id]; tmpRecipe.ID == "" {
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Recipe not found.",
+			"error": "Recipe not found",
 		})
 		return
 	}
-	recipes[index] = recipe
+	recipes[id] = recipe
 	c.JSON(http.StatusOK, recipe)
+}
+
+func DeleteRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+	if tmpRecipe := recipes[id]; tmpRecipe.ID == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Recipe not found",
+		})
+		return
+	}
+	delete(recipes, id)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Recipe deleted",
+	})
 }
 
 func main() {
@@ -93,6 +102,7 @@ func main() {
 	r.POST("/recipes", NewRecipeHandler)
 	r.GET("/recipes", ListRecipesHandler)
 	r.PUT("/recipes/:id", UpdateRecipeHandler)
+	r.DELETE("/recipes/:id", DeleteRecipeHandler)
 
 	r.Run(":" + port)
 }
