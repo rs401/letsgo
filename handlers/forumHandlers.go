@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/rs401/letsgo/models"
 )
 
@@ -12,9 +15,33 @@ import (
 // Get all forums
 func GetForums(c *gin.Context) {
 	db := models.DBConn
+	redisClient := models.RedisClient
 	var forums []models.Forum
-	db.Find(&forums)
-	c.JSON(http.StatusOK, forums)
+	val, err := redisClient.Get(c, "forums").Result()
+	if err == redis.Nil {
+		log.Printf("Not cached, Querying db")
+		result := db.Find(&forums)
+		if result.Error != nil {
+			log.Printf("Error Querying db")
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Internal Error",
+			})
+			return
+		}
+		data, _ := json.Marshal(forums)
+		redisClient.Set(c, "forums", string(data), 0)
+		c.JSON(http.StatusOK, forums)
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Error",
+		})
+		return
+	} else {
+		log.Printf("Request to Redis")
+		forums = make([]models.Forum, 0)
+		json.Unmarshal([]byte(val), &forums)
+		c.JSON(http.StatusOK, forums)
+	}
 }
 
 // Get single forum
