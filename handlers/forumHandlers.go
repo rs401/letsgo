@@ -19,10 +19,10 @@ func GetForums(c *gin.Context) {
 	var forums []models.Forum
 	val, err := redisClient.Get(c, "forums").Result()
 	if err == redis.Nil {
-		log.Printf("Not cached, Querying db")
+		log.Printf("==== Not cached, Querying db")
 		result := db.Find(&forums)
 		if result.Error != nil {
-			log.Printf("Error Querying db")
+			log.Printf("==== Error Querying db")
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Internal Error",
 			})
@@ -37,7 +37,7 @@ func GetForums(c *gin.Context) {
 		})
 		return
 	} else {
-		log.Printf("Request to Redis")
+		log.Printf("==== Request to Redis")
 		forums = make([]models.Forum, 0)
 		json.Unmarshal([]byte(val), &forums)
 		c.JSON(http.StatusOK, forums)
@@ -74,7 +74,16 @@ func NewForum(c *gin.Context) {
 		})
 		return
 	}
-	db.Create(&forum)
+	result := db.Create(&forum)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": result.Error.Error(),
+		})
+		return
+	}
+	log.Println("==== Clearing Redis")
+	redisClient := models.RedisClient
+	redisClient.Del(c, "forums")
 	c.JSON(http.StatusOK, forum)
 }
 
@@ -105,6 +114,9 @@ func DeleteForum(c *gin.Context) {
 		return
 	}
 	db.Delete(&forum)
+	log.Println("==== Clearing Redis")
+	redisClient := models.RedisClient
+	redisClient.Del(c, "forums")
 	c.JSON(http.StatusOK, gin.H{
 		"message": "ok",
 	})
@@ -148,6 +160,9 @@ func UpdateForum(c *gin.Context) {
 	// Update forum and save
 	forum.Name = updForum.Name
 	db.Save(&forum)
+	log.Println("==== Clearing Redis")
+	redisClient := models.RedisClient
+	redisClient.Del(c, "forums")
 
 	c.JSON(http.StatusOK, forum)
 }
