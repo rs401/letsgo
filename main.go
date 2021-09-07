@@ -31,16 +31,7 @@ func init() {
 		panic("Error loading .env file")
 	}
 	models.InitDatabase()
-	// db := models.DBConn
-	// recipes = make([]models.Recipe, 0)
-	// file, _ := ioutil.ReadFile("./recipes.json")
-	// _ = json.Unmarshal([]byte(file), &recipes)
-	// for _, recipe := range recipes {
-	// 	var rec models.Recipe
-	// 	rec = recipe
-	// 	db.Create(&rec)
-	// }
-	// db.Create(&recipes)
+
 }
 
 func Config(key string) string {
