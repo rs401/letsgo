@@ -44,6 +44,15 @@ func init() {
 
 }
 
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.GetHeader("X_API_KEY") != os.Getenv("X_API_KEY") {
+			c.AbortWithStatus(401)
+		}
+		c.Next()
+	}
+}
+
 func Config(key string) string {
 	return os.Getenv(key)
 }
@@ -51,16 +60,21 @@ func Config(key string) string {
 func main() {
 	r := gin.Default()
 	r.GET("/", handlers.IndexHandler)
+	r.GET("/forums", handlers.GetForums)
+	authorized := r.Group("/")
+	authorized.Use(AuthMiddleware())
+	{
+		authorized.POST("/forums", handlers.NewForum)
+		authorized.GET("/forums/:id", handlers.GetForum)
+		authorized.PUT("/forums/:id", handlers.UpdateForum)
+		authorized.DELETE("/forums/:id", handlers.DeleteForum)
+
+	}
 	// r.POST("/recipes", handlers.NewRecipeHandler)
 	// r.GET("/recipes", handlers.ListRecipesHandler)
 	// r.PUT("/recipes/:id", handlers.UpdateRecipeHandler)
 	// r.DELETE("/recipes/:id", handlers.DeleteRecipeHandler)
 	// r.GET("/recipes/search", handlers.SearchRecipesHandler)
-	r.GET("/forums", handlers.GetForums)
-	r.POST("/forums", handlers.NewForum)
-	r.GET("/forums/:id", handlers.GetForum)
-	r.PUT("/forums/:id", handlers.UpdateForum)
-	r.DELETE("/forums/:id", handlers.DeleteForum)
 
 	r.Run(":" + Config("API_PORT"))
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -66,6 +67,12 @@ func GetForum(c *gin.Context) {
 }
 
 func NewForum(c *gin.Context) {
+	if c.GetHeader("X_API_KEY") != os.Getenv("X_API_KEY") {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "API Key not provided or invalid.",
+		})
+		return
+	}
 	db := models.DBConn
 	forum := new(models.Forum)
 	if err := c.ShouldBindJSON(&forum); err != nil {

@@ -16,3 +16,4 @@ vendor/
 
 main
 .env
+words.txt
