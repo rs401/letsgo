@@ -59,6 +59,7 @@ func main() {
 	r.Use(sessions.Sessions("letsgo_api", store))
 
 	r.Static("/static", "./static")
+	r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", handlers.IndexHandler)
 	r.GET("/forums", handlers.GetForumsHandler)

@@ -1,10 +1,17 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rs401/letsgo/models"
+)
 
 func IndexHandler(c *gin.Context) {
-	// c.JSON(200, gin.H{
-	// 	"message": "Let's Go",
-	// })
-	c.File("./static/index.html")
+	db := models.DBConn
+	var forums []models.Forum
+	db.Find(&forums)
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"forums": forums,
+	})
 }

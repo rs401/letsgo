@@ -1,0 +1,11 @@
+{{template "head"}}
+    <h1>Lets Go</h1>
+    <div class="forums">
+    {{range .forums}}
+        <div class="forum">
+            {{.Name}}
+        </div>
+    {{end}}
+    </div>
+
+{{template "foot"}}
