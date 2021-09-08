@@ -58,8 +58,10 @@ func main() {
 	store.Options(sessions.Options{MaxAge: 3600})
 	r.Use(sessions.Sessions("letsgo_api", store))
 
+	r.Static("/static", "./static")
+
 	r.GET("/", handlers.IndexHandler)
-	r.GET("/forums", handlers.GetForums)
+	r.GET("/forums", handlers.GetForumsHandler)
 	r.POST("/register", authHandler.RegisterHandler)
 	r.POST("/signin", authHandler.SignInHandler)
 	r.POST("/refresh", authHandler.RefreshHandler)
@@ -67,10 +69,10 @@ func main() {
 	authorized := r.Group("/")
 	authorized.Use(authHandler.AuthMiddleware())
 	{
-		authorized.POST("/forums", handlers.NewForum)
-		authorized.GET("/forums/:id", handlers.GetForum)
-		authorized.PUT("/forums/:id", handlers.UpdateForum)
-		authorized.DELETE("/forums/:id", handlers.DeleteForum)
+		authorized.POST("/forums", handlers.NewForumHandler)
+		authorized.GET("/forums/:id", handlers.GetForumHandler)
+		authorized.PUT("/forums/:id", handlers.UpdateForumHandler)
+		authorized.DELETE("/forums/:id", handlers.DeleteForumHandler)
 
 	}
 	// r.POST("/recipes", handlers.NewRecipeHandler)
@@ -79,5 +81,6 @@ func main() {
 	// r.DELETE("/recipes/:id", handlers.DeleteRecipeHandler)
 	// r.GET("/recipes/search", handlers.SearchRecipesHandler)
 
-	r.Run(":" + Config("API_PORT"))
+	// r.Run(":" + Config("API_PORT"))
+	r.RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
 }

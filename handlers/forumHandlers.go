@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs401/letsgo/models"
@@ -13,7 +14,7 @@ import (
 
 // Forums
 // Get all forums
-func GetForums(c *gin.Context) {
+func GetForumsHandler(c *gin.Context) {
 	db := models.DBConn
 	redisClient := models.RedisClient
 	var forums []models.Forum
@@ -45,7 +46,7 @@ func GetForums(c *gin.Context) {
 }
 
 // Get single forum
-func GetForum(c *gin.Context) {
+func GetForumHandler(c *gin.Context) {
 	db := models.DBConn
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -65,7 +66,16 @@ func GetForum(c *gin.Context) {
 	c.JSON(http.StatusOK, forum)
 }
 
-func NewForum(c *gin.Context) {
+func NewForumHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	sessionUser := session.Get("email")
+	user := getUserByEmail(sessionUser.(string))
+	if user == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "InternalServerError",
+		})
+		return
+	}
 	db := models.DBConn
 	forum := new(models.Forum)
 	if err := c.ShouldBindJSON(&forum); err != nil {
@@ -74,7 +84,7 @@ func NewForum(c *gin.Context) {
 		})
 		return
 	}
-
+	forum.User = *user
 	result := db.Create(&forum)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -88,7 +98,7 @@ func NewForum(c *gin.Context) {
 	c.JSON(http.StatusOK, forum)
 }
 
-func DeleteForum(c *gin.Context) {
+func DeleteForumHandler(c *gin.Context) {
 	// Grab db
 	db := models.DBConn
 	// Convert string parameter to int
@@ -123,7 +133,7 @@ func DeleteForum(c *gin.Context) {
 	})
 }
 
-func UpdateForum(c *gin.Context) {
+func UpdateForumHandler(c *gin.Context) {
 	// Grab db
 	db := models.DBConn
 	// Convert string parameter to int

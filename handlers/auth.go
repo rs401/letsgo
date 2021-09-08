@@ -40,20 +40,20 @@ func getUserByEmail(e string) *models.User {
 
 func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// tokenValue := c.GetHeader("Authorization")
-		// claims := &Claims{}
-
-		// tkn, err := jwt.ParseWithClaims(tokenValue, claims,
-		// 	func(token *jwt.Token) (interface{}, error) {
-		// 		return []byte(SecretKey), nil
-		// 	})
+		// var auth0Domain = "https://" + os.Getenv("AUTH0_DOMAIN") + "/"
+		// client := auth0.NewJWKClient(auth0.JWKClientOptions{
+		// 	URI: auth0Domain + ".well-known/jwks.json",
+		// }, nil)
+		// configuration := auth0.NewConfiguration(client, []string{os.Getenv("AUTH0_API_IDENTIFIER")}, auth0Domain, jose.RS256)
+		// validator := auth0.NewValidator(configuration, nil)
+		// _, err := validator.ValidateRequest(c.Request)
 		// if err != nil {
-		// 	c.AbortWithStatus(http.StatusUnauthorized)
+		// 	c.JSON(http.StatusUnauthorized, gin.H{
+		// 		"message": "invalid token",
+		// 	})
+		// 	c.Abort()
+		// 	return
 		// }
-		// if tkn == nil || !tkn.Valid {
-		// 	c.AbortWithStatus(http.StatusUnauthorized)
-		// }
-
 		session := sessions.Default(c)
 		sessionToken := session.Get("token")
 		if sessionToken == nil {
@@ -68,49 +68,6 @@ func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 }
 
 func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
-	// tokenValue := c.GetHeader("Authorization")
-	// claims := &Claims{}
-
-	// tkn, err := jwt.ParseWithClaims(tokenValue, claims,
-	// 	func(token *jwt.Token) (interface{}, error) {
-	// 		return []byte(SecretKey), nil
-	// 	})
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{
-	// 		"error": err.Error(),
-	// 	})
-	// 	return
-	// }
-	// if tkn == nil || !tkn.Valid {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{
-	// 		"error": "Invalid token",
-	// 	})
-	// 	return
-	// }
-	// if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"error": "Token is not expired yet.",
-	// 	})
-	// 	return
-	// }
-
-	// expirationTime := time.Now().Add(5 * time.Minute)
-	// claims.ExpiresAt = expirationTime.Unix()
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	// tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{
-	// 		"error": err.Error(),
-	// 	})
-	// 	return
-	// }
-
-	// jwtOutput := JWTOutput{
-	// 	Token:   tokenString,
-	// 	Expires: expirationTime,
-	// }
-
-	// c.JSON(http.StatusOK, jwtOutput)
 	session := sessions.Default(c)
 	sessionToken := session.Get("token")
 	sessionUser := session.Get("email")
@@ -150,30 +107,6 @@ func (handler *AuthHandler) SignInHandler(c *gin.Context) {
 		})
 		return
 	}
-
-	// expirationTime := time.Now().Add(10 * time.Minute)
-	// claims := &Claims{
-	// 	Email: user.Email,
-	// 	StandardClaims: jwt.StandardClaims{
-	// 		ExpiresAt: expirationTime.Unix(),
-	// 	},
-	// }
-
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	// tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{
-	// 		"error": err.Error(),
-	// 	})
-	// 	return
-	// }
-
-	// jwtOutput := JWTOutput{
-	// 	Token:   tokenString,
-	// 	Expires: expirationTime,
-	// }
-
-	// c.JSON(http.StatusOK, jwtOutput)
 
 	sessionToken := uuid.NewString()
 	session := sessions.Default(c)
