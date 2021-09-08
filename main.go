@@ -18,19 +18,22 @@ package main
 import (
 	"os"
 
+	"github.com/gin-contrib/sessions"
+	redisStore "github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs401/letsgo/handlers"
 	"github.com/rs401/letsgo/models"
 )
 
-// var recipes []models.Recipe
+var authHandler *handlers.AuthHandler
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
 		panic("Error loading .env file")
 	}
 	models.InitDatabase()
+	authHandler = &handlers.AuthHandler{}
 
 	// Seed some forums for testing
 	// bytesRead, _ := ioutil.ReadFile("words.txt")
@@ -44,25 +47,25 @@ func init() {
 
 }
 
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if c.GetHeader("X_API_KEY") != os.Getenv("X_API_KEY") {
-			c.AbortWithStatus(401)
-		}
-		c.Next()
-	}
-}
-
 func Config(key string) string {
 	return os.Getenv(key)
 }
 
 func main() {
 	r := gin.Default()
+
+	store, _ := redisStore.NewStore(10, "tcp", Config("REDIS_HOST")+":"+Config("REDIS_PORT"), "", []byte("secret"))
+	store.Options(sessions.Options{MaxAge: 3600})
+	r.Use(sessions.Sessions("letsgo_api", store))
+
 	r.GET("/", handlers.IndexHandler)
 	r.GET("/forums", handlers.GetForums)
+	r.POST("/register", authHandler.RegisterHandler)
+	r.POST("/signin", authHandler.SignInHandler)
+	r.POST("/refresh", authHandler.RefreshHandler)
+	r.POST("/signout", authHandler.SignOutHandler)
 	authorized := r.Group("/")
-	authorized.Use(AuthMiddleware())
+	authorized.Use(authHandler.AuthMiddleware())
 	{
 		authorized.POST("/forums", handlers.NewForum)
 		authorized.GET("/forums/:id", handlers.GetForum)
