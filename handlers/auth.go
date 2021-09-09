@@ -14,7 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	// "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/rs401/letsgo/models"
 	"golang.org/x/crypto/bcrypt"
@@ -26,7 +25,6 @@ var SecretKey = os.Getenv("JWT_SECRET")
 
 type AuthHandler struct{}
 
-// User is a retrieved and authentiacted user.
 type GUser struct {
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
@@ -35,16 +33,6 @@ type GUser struct {
 
 var conf *oauth2.Config
 var state string
-
-// type Claims struct {
-// 	Email string `json:"email"`
-// 	jwt.StandardClaims
-// }
-
-// type JWTOutput struct {
-// 	Token   string    `json:"token"`
-// 	Expires time.Time `json:"expires"`
-// }
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -74,20 +62,6 @@ func getUserByEmail(e string) *models.User {
 
 func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// var auth0Domain = "https://" + os.Getenv("AUTH0_DOMAIN") + "/"
-		// client := auth0.NewJWKClient(auth0.JWKClientOptions{
-		// 	URI: auth0Domain + ".well-known/jwks.json",
-		// }, nil)
-		// configuration := auth0.NewConfiguration(client, []string{os.Getenv("AUTH0_API_IDENTIFIER")}, auth0Domain, jose.RS256)
-		// validator := auth0.NewValidator(configuration, nil)
-		// _, err := validator.ValidateRequest(c.Request)
-		// if err != nil {
-		// 	c.JSON(http.StatusUnauthorized, gin.H{
-		// 		"message": "invalid token",
-		// 	})
-		// 	c.Abort()
-		// 	return
-		// }
 		session := sessions.Default(c)
 		sessionToken := session.Get("token")
 		if sessionToken == nil {
@@ -162,9 +136,6 @@ func getLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
 }
 
-/* Need to set this as /login handler with user:pass form for reg auth and a
- * Google login button to sign in with Google, then form post to SigninHandler
- * and Google auth return will go to authcallback handler https://skarlso.github.io/2016/06/12/google-signin-with-go/ */
 func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	state = randToken()
 	session := sessions.Default(c)
