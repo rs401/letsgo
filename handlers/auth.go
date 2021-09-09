@@ -240,12 +240,6 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// swagger:operation POST /signout auth signOut
-// Signing out
-// ---
-// responses:
-//     '200':
-//         description: Successful operation
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
