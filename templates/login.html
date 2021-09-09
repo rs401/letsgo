@@ -1,0 +1,24 @@
+{{template "head.html"}}
+    <div class="row">
+        <div class="col">
+            <h1>Login</h1>
+            <div class="login">
+                <form method="POST" action="/signin">
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="Email" name="Email" aria-describedby="emailHelp">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Pass1" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="Pass1" name="Pass1">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div class="col">
+            <a href="{{ .gurl}}"><img src="/static/img/btn_google_signin_dark_normal_web.png" alt="Sign In with Google"></a>
+        </div>
+    </div>
+
+{{template "foot.html"}}

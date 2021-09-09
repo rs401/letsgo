@@ -1,31 +1,65 @@
 package handlers
 
 import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/joho/godotenv"
+
+	// "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/rs401/letsgo/models"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 var SecretKey = os.Getenv("JWT_SECRET")
 
 type AuthHandler struct{}
 
-type Claims struct {
-	Email string `json:"email"`
-	jwt.StandardClaims
+// User is a retrieved and authentiacted user.
+type GUser struct {
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+	Email   string `json:"email"`
 }
 
-type JWTOutput struct {
-	Token   string    `json:"token"`
-	Expires time.Time `json:"expires"`
+var conf *oauth2.Config
+var state string
+
+// type Claims struct {
+// 	Email string `json:"email"`
+// 	jwt.StandardClaims
+// }
+
+// type JWTOutput struct {
+// 	Token   string    `json:"token"`
+// 	Expires time.Time `json:"expires"`
+// }
+
+func init() {
+	if err := godotenv.Load(".env"); err != nil {
+		panic("Error loading .env file")
+	}
+	conf = &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  "https://127.0.0.1:9000/auth-callback",
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+		Endpoint: google.Endpoint,
+	}
 }
 
 func getUserByEmail(e string) *models.User {
@@ -83,6 +117,7 @@ func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "New session issued"})
 }
+
 func (handler *AuthHandler) SignInHandler(c *gin.Context) {
 	var loginUser models.LoginUser
 
@@ -115,6 +150,84 @@ func (handler *AuthHandler) SignInHandler(c *gin.Context) {
 	session.Save()
 
 	c.JSON(http.StatusOK, gin.H{"message": "User signed in"})
+}
+
+func randToken() string {
+	b := make([]byte, 32)
+	rand.Read(b)
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func getLoginURL(state string) string {
+	return conf.AuthCodeURL(state)
+}
+
+/* Need to set this as /login handler with user:pass form for reg auth and a
+ * Google login button to sign in with Google, then form post to SigninHandler
+ * and Google auth return will go to authcallback handler https://skarlso.github.io/2016/06/12/google-signin-with-go/ */
+func (handler *AuthHandler) LoginHandler(c *gin.Context) {
+	state = randToken()
+	session := sessions.Default(c)
+	session.Set("state", state)
+	session.Save()
+	url := getLoginURL(state)
+	c.HTML(http.StatusOK, "login.html", gin.H{
+		"gurl": url,
+	})
+}
+
+func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	if callbackState := session.Get("state"); callbackState != c.Query("state") {
+		c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("invalid session state: %s", callbackState))
+		return
+	}
+
+	token, err := conf.Exchange(context.Background(), c.Query("code"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	client := conf.Client(context.Background(), token)
+	email, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	defer email.Body.Close()
+	data, _ := ioutil.ReadAll(email.Body)
+	fmt.Println("==== Email body: ", string(data))
+
+	// read email, name, picture into GUser model
+	var guser models.GUser
+	if err := json.Unmarshal(data, &guser); err != nil {
+		fmt.Println("Couldn't unmarshal data to guser: ", err.Error())
+	}
+	// check if user exists
+	user := getUserByEmail(guser.Email)
+	if user == nil {
+		// if not exists, create new user
+		user := models.User{
+			DisplayName: guser.Name,
+			Email:       guser.Email,
+			Picture:     guser.Picture,
+		}
+
+		models.DBConn.Create(&user)
+	}
+	// if exists, set and update displayname and picture
+	user.DisplayName = guser.Name
+	user.Picture = guser.Picture
+	models.DBConn.Save(&user)
+	// Set auth session
+	sessionToken := uuid.NewString()
+	session = sessions.Default(c)
+	session.Set("email", user.Email)
+	session.Set("token", sessionToken)
+	session.Save()
+
+	c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {

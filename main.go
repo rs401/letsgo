@@ -63,8 +63,10 @@ func main() {
 
 	r.GET("/", handlers.IndexHandler)
 	r.GET("/forums", handlers.GetForumsHandler)
+	r.GET("/login", authHandler.LoginHandler)
 	r.POST("/register", authHandler.RegisterHandler)
 	r.POST("/signin", authHandler.SignInHandler)
+	r.GET("/auth-callback", authHandler.CallbackHandler)
 	r.POST("/refresh", authHandler.RefreshHandler)
 	r.POST("/signout", authHandler.SignOutHandler)
 	authorized := r.Group("/")
