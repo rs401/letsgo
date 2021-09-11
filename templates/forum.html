@@ -1,0 +1,14 @@
+{{template "head.html" . }}
+
+    <h1>Forum</h1> 
+    {{range .flashes}}
+    <div class="alert alert-info">{{.}}</div>
+    {{end}}
+    <div class="container-md forums border border-2 rounded ">
+        <div class="container-sm forum my-2">
+        <div>Owner: {{ .forum.User.Email}}</div>
+            {{.forum.Name}} <a href="/update_forum/{{.forum.ID}}">Edit Group</a> | <a href="/del_forum/{{.forum.ID}}">Delete Group</a>
+        </div>
+    </div>
+
+{{template "foot.html" .}}

@@ -26,7 +26,9 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+var mainHandler *handlers.MainHandler
 var authHandler *handlers.AuthHandler
+var forumHandler *handlers.ForumHandler
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -34,6 +36,7 @@ func init() {
 	}
 	models.InitDatabase()
 	authHandler = &handlers.AuthHandler{}
+	mainHandler = &handlers.MainHandler{}
 
 	// Seed some forums for testing
 	// bytesRead, _ := ioutil.ReadFile("words.txt")
@@ -59,31 +62,30 @@ func main() {
 	r.Use(sessions.Sessions("letsgo_api", store))
 
 	r.Static("/static", "./static")
+	r.StaticFile("/favicon.ico", "./favicon.ico")
 	r.LoadHTMLGlob("templates/*")
 
-	r.GET("/", handlers.IndexHandler)
-	r.GET("/forums", handlers.GetForumsHandler)
+	r.GET("/", mainHandler.IndexHandler)
+	r.GET("/forums", forumHandler.GetForumsHandler)
 	r.GET("/login", authHandler.LoginHandler)
+	r.GET("/register", authHandler.RegisterHandler)
 	r.POST("/register", authHandler.RegisterHandler)
-	r.POST("/signin", authHandler.SignInHandler)
+	r.POST("/login", authHandler.LoginHandler)
 	r.GET("/auth-callback", authHandler.CallbackHandler)
 	r.POST("/refresh", authHandler.RefreshHandler)
-	r.POST("/signout", authHandler.SignOutHandler)
+	r.GET("/signout", authHandler.SignOutHandler)
 	authorized := r.Group("/")
 	authorized.Use(authHandler.AuthMiddleware())
 	{
-		authorized.POST("/forums", handlers.NewForumHandler)
-		authorized.GET("/forums/:id", handlers.GetForumHandler)
-		authorized.PUT("/forums/:id", handlers.UpdateForumHandler)
-		authorized.DELETE("/forums/:id", handlers.DeleteForumHandler)
+		authorized.POST("/forums", forumHandler.NewForumHandler)
+		authorized.GET("/new_forum", forumHandler.NewForumHandler)
+		authorized.GET("/forums/:id", forumHandler.GetForumHandler)
+		authorized.GET("/update_forum/:id", forumHandler.UpdateForumHandler)
+		authorized.POST("/update_forum/:id", forumHandler.UpdateForumHandler)
+		authorized.POST("/del_forum/:id", forumHandler.DeleteForumHandler)
+		authorized.GET("/del_forum/:id", forumHandler.ConfirmDeleteForumHandler)
 
 	}
-	// r.POST("/recipes", handlers.NewRecipeHandler)
-	// r.GET("/recipes", handlers.ListRecipesHandler)
-	// r.PUT("/recipes/:id", handlers.UpdateRecipeHandler)
-	// r.DELETE("/recipes/:id", handlers.DeleteRecipeHandler)
-	// r.GET("/recipes/search", handlers.SearchRecipesHandler)
 
-	// r.Run(":" + Config("API_PORT"))
 	r.RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
 }

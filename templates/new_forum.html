@@ -1,0 +1,17 @@
+{{template "head.html" . }}
+
+    <h1>Create Forum</h1> 
+    <div class="container-md forums border border-2 rounded ">
+        <form action="/forums" method="post">
+            {{range .flashes}}
+            <div class="alert alert-info">{{.}}</div>
+            {{end}}
+            <div class="mb-3">
+                <label for="name" class="form-label">Group Name</label>
+                <input type="text" class="form-control" id="name" name="name" aria-describedby="NameHelp">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+{{template "foot.html" .}}
