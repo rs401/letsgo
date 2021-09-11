@@ -1,4 +1,12 @@
 body {
-    background-color: darkslategray;
-    color: aliceblue;
+}
+
+.login {
+    max-width: 600px;
+}
+
+.forums {
+}
+
+.forum {
 }

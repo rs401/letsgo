@@ -65,9 +65,7 @@ func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		session := sessions.Default(c)
 		sessionToken := session.Get("token")
 		if sessionToken == nil {
-			c.JSON(http.StatusForbidden, gin.H{
-				"message": "Not signed in",
-			})
+			c.String(http.StatusForbidden, "Not signed in")
 			c.Abort()
 		}
 
@@ -92,38 +90,59 @@ func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "New session issued"})
 }
 
-func (handler *AuthHandler) SignInHandler(c *gin.Context) {
-	var loginUser models.LoginUser
-
-	if err := c.ShouldBindJSON(&loginUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid input",
+func (handler *AuthHandler) LoginHandler(c *gin.Context) {
+	if c.Request.Method == "GET" {
+		state = randToken()
+		session := sessions.Default(c)
+		session.Set("state", state)
+		session.Save()
+		url := getLoginURL(state)
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"gurl": url,
 		})
+		return
+	}
+	var loginUser models.LoginUser
+	session := sessions.Default(c)
+
+	if err := c.Bind(&loginUser); err != nil {
+		session.AddFlash("Invalid Input")
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+			"error":   "Invalid input",
+			"flashes": session.Flashes(),
+		})
+		session.Save()
 		return
 	}
 
 	user := getUserByEmail(loginUser.Email)
 	if user == nil {
-		c.JSON(http.StatusNotFound, gin.H{
+		session.AddFlash("Email/Password Incorrect")
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{
 			"message": "email/password incorrect",
+			"flashes": session.Flashes(),
 		})
+		session.Save()
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(loginUser.Pass1)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		session.AddFlash("Email/Password Incorrect")
+		c.HTML(http.StatusBadRequest, "login.html", gin.H{
 			"message": "email/password incorrect",
+			"flashes": session.Flashes(),
 		})
+		session.Save()
 		return
 	}
 
 	sessionToken := uuid.NewString()
-	session := sessions.Default(c)
 	session.Set("email", user.Email)
 	session.Set("token", sessionToken)
+	session.AddFlash("User signed in")
 	session.Save()
 
-	c.JSON(http.StatusOK, gin.H{"message": "User signed in"})
+	c.Redirect(http.StatusFound, "/")
 }
 
 func randToken() string {
@@ -134,17 +153,6 @@ func randToken() string {
 
 func getLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
-}
-
-func (handler *AuthHandler) LoginHandler(c *gin.Context) {
-	state = randToken()
-	session := sessions.Default(c)
-	session.Set("state", state)
-	session.Save()
-	url := getLoginURL(state)
-	c.HTML(http.StatusOK, "login.html", gin.H{
-		"gurl": url,
-	})
 }
 
 func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
@@ -196,37 +204,60 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	session = sessions.Default(c)
 	session.Set("email", user.Email)
 	session.Set("token", sessionToken)
+	session.AddFlash("User signed in")
 	session.Save()
 
 	c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
-	var newUser models.NewUser
-
-	if err := c.ShouldBindJSON(&newUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid input",
+	if c.Request.Method == "GET" {
+		c.HTML(http.StatusOK, "register.html", gin.H{
+			"message": "register",
 		})
+		return
+	}
+	var newUser models.NewUser
+	session := sessions.Default(c)
+
+	if err := c.Bind(&newUser); err != nil {
+		session.AddFlash("invalid input")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"error":   "invalid input",
+			"flashes": session.Flashes(),
+		})
+		session.Save()
 		return
 	}
 
 	if err := getUserByEmail(newUser.Email); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "email already exists in database",
+		session.AddFlash("email already exists in database")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"error":   "email already exists in database",
+			"flashes": session.Flashes(),
 		})
+		session.Save()
 		return
 	}
 	// Check passwords match
 	if newUser.Pass1 == "" || newUser.Pass1 != newUser.Pass2 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Passwords do not match.",
+		session.AddFlash("Passwords do not match.")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"error":   "Passwords do not match.",
+			"flashes": session.Flashes(),
 		})
+		session.Save()
 		return
 	}
 	password, err := bcrypt.GenerateFromPassword([]byte(newUser.Pass1), 14)
 	if err != nil {
 		fmt.Println("=========== Houston, we have a problem")
+		session.AddFlash("Passwords do not match.")
+		c.HTML(http.StatusInternalServerError, "register.html", gin.H{
+			"error":   "internal server error",
+			"flashes": session.Flashes(),
+		})
+		session.Save()
 	}
 
 	user := models.User{
@@ -237,12 +268,13 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 	models.DBConn.Create(&user)
 
-	c.JSON(http.StatusOK, user)
+	c.Redirect(http.StatusFound, "login.html")
 }
 
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
+	session.AddFlash("Signed out.")
+	c.Redirect(http.StatusFound, "/login")
 	session.Save()
-	c.JSON(http.StatusOK, gin.H{"message": "Signed out..."})
 }

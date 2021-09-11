@@ -9,3 +9,7 @@ type Forum struct {
 	User    User
 	Threads []Thread
 }
+
+type NewForum struct {
+	Name string `json:"name" form:"name"`
+}

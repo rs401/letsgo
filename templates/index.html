@@ -1,6 +1,6 @@
-{{template "head.html"}}
+{{template "head.html" . }}
 
-    <h1>Lets Go</h1>
+    <h1>Lets Go</h1> 
     <div class="forums">
     {{range .forums}}
         <div class="forum">
@@ -9,4 +9,4 @@
     {{end}}
     </div>
 
-{{template "foot.html"}}
+{{template "foot.html" .}}

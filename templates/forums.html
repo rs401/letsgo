@@ -1,0 +1,18 @@
+{{template "head.html" . }}
+
+    <h1>Lets Go</h1>
+    {{range .flashes}}
+    <div class="alert alert-info">{{.}}</div>
+    {{end}}
+    <div>
+        <a href="/new_forum">Create New Group</a>
+    </div>
+    <div class="container-md forums border border-2 rounded ">
+    {{range .forums}}
+        <div class="container-sm forum my-2">
+            <a href="forums/{{.ID}}">{{.Name}}</a>
+        </div>
+    {{end}}
+    </div>
+
+{{template "foot.html" .}}
