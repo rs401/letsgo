@@ -205,9 +205,9 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	session.Set("email", user.Email)
 	session.Set("token", sessionToken)
 	session.AddFlash("User signed in")
-	session.Save()
 
 	c.Redirect(http.StatusTemporaryRedirect, "/")
+	session.Save()
 }
 
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 	"github.com/rs401/letsgo/models"
 )
 
@@ -107,9 +108,13 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	}
 
 	if c.Request.Method == "GET" {
+		csrf := uuid.NewString()
+		session.Set("csrf", csrf)
 		c.HTML(http.StatusOK, "new_forum.html", gin.H{
 			"user": email,
+			"csrf": csrf,
 		})
+		session.Save()
 		return
 	}
 
@@ -119,6 +124,19 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	if err := c.Bind(&newForum); err != nil {
 		session.AddFlash("Bad Request")
 		c.Redirect(http.StatusFound, "/new_forum")
+		session.Save()
+		return
+	}
+	// Check csrf
+	if newForum.Csrf != fmt.Sprintf("%v", session.Get("csrf")) {
+		session.AddFlash("Cross Site Request Forgery")
+		log.Println("==== CSRF did not match")
+		log.Printf("==== %v", session.Get("email"))
+		c.HTML(http.StatusOK, "new_forum.html", gin.H{
+			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
 		session.Save()
 		return
 	}
@@ -140,10 +158,14 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 func (handler *ForumHandler) ConfirmDeleteForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
+	csrf := uuid.NewString()
+	session.Set("csrf", csrf)
 	c.HTML(http.StatusOK, "confirm_delete.html", gin.H{
 		"user": email,
 		"id":   c.Param("id"),
+		"csrf": csrf,
 	})
+	session.Save()
 }
 
 func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
@@ -160,6 +182,27 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 			"message": "badrequest",
 			"flashes": session.Flashes(),
 			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+		})
+		session.Save()
+		return
+	}
+	var delForum models.DelForum
+	if err := c.Bind(&delForum); err != nil {
+		session.AddFlash("Bad Request")
+		c.Redirect(http.StatusFound, "/forums")
+		session.Save()
+		return
+	}
+	// Check csrf
+	if delForum.Csrf != fmt.Sprintf("%v", session.Get("csrf")) {
+		session.AddFlash("Cross Site Request Forgery")
+		log.Println("==== CSRF did not match")
+		log.Printf("==== %v", session.Get("email"))
+		c.HTML(http.StatusOK, "confirm_delete.html", gin.H{
+			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
 		})
 		session.Save()
 		return
@@ -242,11 +285,15 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		return
 	}
 	if c.Request.Method == "GET" {
+		csrf := uuid.NewString()
+		session.Set("csrf", csrf)
 		c.HTML(http.StatusOK, "update_forum.html", gin.H{
 			"user":  email,
 			"id":    id,
 			"forum": forum,
+			"csrf":  csrf,
 		})
+		session.Save()
 		return
 	}
 	// Parse new values
@@ -255,6 +302,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "update_forum.html", gin.H{
 			"message": "badrequest",
 			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
 		session.Save()
@@ -266,6 +314,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "update_forum.html", gin.H{
 			"message": "badrequest",
 			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
 		session.Save()
@@ -277,6 +326,19 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 			"message": "forbidden",
 			"flashes": session.Flashes(),
 			"user":    email,
+		})
+		session.Save()
+		return
+	}
+	// Check csrf
+	if updForum.Csrf != fmt.Sprintf("%v", session.Get("csrf")) {
+		session.AddFlash("Cross Site Request Forgery")
+		log.Println("==== CSRF did not match")
+		log.Printf("==== %v", session.Get("email"))
+		c.HTML(http.StatusOK, "update_forum.html", gin.H{
+			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
 		})
 		session.Save()
 		return
