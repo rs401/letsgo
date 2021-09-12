@@ -12,4 +12,9 @@ type Forum struct {
 
 type NewForum struct {
 	Name string `json:"name" form:"name"`
+	Csrf string `json:"csrf" form:"csrf"`
+}
+
+type DelForum struct {
+	Csrf string `json:"csrf" form:"csrf"`
 }
