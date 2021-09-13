@@ -27,3 +27,12 @@ func (handler *MainHandler) IndexHandler(c *gin.Context) {
 		"user":   user.Email,
 	})
 }
+
+func (handler *MainHandler) ErrorHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	session.AddFlash(c.Errors.Errors())
+	c.HTML(http.StatusOK, "error.html", gin.H{
+		"flashes": c.Errors.Errors(),
+	})
+	session.Save()
+}

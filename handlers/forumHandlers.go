@@ -28,7 +28,7 @@ func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 	val, err := redisClient.Get(c, "forums").Result()
 	if err == redis.Nil {
 		log.Printf("==== Not cached, Querying db")
-		result := db.Find(&forums)
+		result := db.Order("created_at desc").Find(&forums)
 		if result.Error != nil {
 			session.AddFlash("Internal Error")
 			log.Printf("==== Error Querying db")
@@ -94,6 +94,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "forum.html", gin.H{
 		"forum":      forum,
 		"forum.User": forum.User,
+		"threads":    forum.Threads,
 		"user":       email,
 	})
 }

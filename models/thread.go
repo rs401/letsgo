@@ -13,8 +13,8 @@ type Thread struct {
 	Posts   []Post `json:""`
 }
 
-// type Session struct {
-// 	gorm.Model
-// 	UserID uint `json:"userid" gorm:"not null"`
-// 	Email  string
-// }
+type NewThread struct {
+	Title string `json:"title" form:"title"`
+	Body  string `json:"body" form:"body"`
+	Csrf  string `json:"csrf" form:"csrf"`
+}

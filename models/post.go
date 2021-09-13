@@ -11,3 +11,8 @@ type Post struct {
 	Thread   Thread
 	// Thread Thread //`json:"thread"`
 }
+
+type NewPost struct {
+	Body string `json:"body" form:"body"`
+	Csrf string `json:"csrf" form:"csrf"`
+}

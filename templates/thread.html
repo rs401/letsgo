@@ -1,0 +1,26 @@
+{{template "head.html" . }}
+
+    <h1>{{ .thread.Title }}</h1> 
+    {{range .flashes}}
+    <div class="alert alert-info">{{.}}</div>
+    {{end}}
+    <div class="container-md forums border border-5 rounded ">
+        <div class="container-sm thread my-2">
+            <div class="op">Op: {{ .thread.User.DisplayName}}
+            {{ if eq .thread.User.Email .user}}
+                <a href="/update_thread/{{.thread.ID}}">Edit Event</a> | <a href="/del_thread/{{.thread.ID}}">Delete Event</a>
+            {{end}}
+            </div>
+            <div>{{ .thread.Body}}</div>
+        </div>
+        <div>
+            <a href="/new_post/{{.thread.ID}}">New Post</a>
+        </div>
+        <div class="container-sm">
+            {{range .posts}}
+                <div>{{.Body}}</div>
+            {{end}}
+        </div>
+    </div>
+
+{{template "foot.html" .}}
