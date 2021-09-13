@@ -1,0 +1,13 @@
+{{template "head.html" . }}
+    <div class="login mx-auto">
+        <h1>Error</h1>
+        <div class="col">
+            {{range .flashes}}
+            <div class="alert alert-info">{{.}}</div>
+            {{end}}
+               
+        </div>
+        <h1>Errors.</h1>
+    </div>
+
+{{template "foot.html" . }}

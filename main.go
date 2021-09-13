@@ -29,6 +29,8 @@ import (
 var mainHandler *handlers.MainHandler
 var authHandler *handlers.AuthHandler
 var forumHandler *handlers.ForumHandler
+var threadHandler *handlers.ThreadHandler
+var postHandler *handlers.PostHandler
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -37,6 +39,8 @@ func init() {
 	models.InitDatabase()
 	authHandler = &handlers.AuthHandler{}
 	mainHandler = &handlers.MainHandler{}
+	threadHandler = &handlers.ThreadHandler{}
+	postHandler = &handlers.PostHandler{}
 
 	// Seed some forums for testing
 	// bytesRead, _ := ioutil.ReadFile("words.txt")
@@ -65,6 +69,9 @@ func main() {
 	r.StaticFile("/favicon.ico", "./favicon.ico")
 	r.LoadHTMLGlob("templates/*")
 
+	// Errors
+	// r.NoRoute(mainHandler.ErrorHandler)
+
 	r.GET("/", mainHandler.IndexHandler)
 	r.GET("/forums", forumHandler.GetForumsHandler)
 	r.GET("/login", authHandler.LoginHandler)
@@ -84,6 +91,13 @@ func main() {
 		authorized.POST("/update_forum/:id", forumHandler.UpdateForumHandler)
 		authorized.POST("/del_forum/:id", forumHandler.DeleteForumHandler)
 		authorized.GET("/del_forum/:id", forumHandler.ConfirmDeleteForumHandler)
+
+		authorized.GET("/new_thread/:fid", threadHandler.NewThreadHandler)
+		authorized.POST("/new_thread/:fid", threadHandler.NewThreadHandler)
+		authorized.GET("/thread/:id", threadHandler.GetThreadHandler)
+
+		authorized.GET("/new_post/:tid", postHandler.NewPostHandler)
+		authorized.POST("/new_post/:tid", postHandler.NewPostHandler)
 
 	}
 

@@ -1,13 +1,27 @@
 {{template "head.html" . }}
 
-    <h1>Forum</h1> 
+    <h1>{{ .forum.Name }}</h1> 
     {{range .flashes}}
     <div class="alert alert-info">{{.}}</div>
     {{end}}
     <div class="container-md forums border border-2 rounded ">
         <div class="container-sm forum my-2">
         <div>Owner: {{ .forum.User.Email}}</div>
-            {{.forum.Name}} <a href="/update_forum/{{.forum.ID}}">Edit Group</a> | <a href="/del_forum/{{.forum.ID}}">Delete Group</a>
+        {{ if eq .forum.User.Email .user }}
+            <div>{{.forum.Name}} <a href="/update_forum/{{.forum.ID}}">Edit Group</a> | <a href="/del_forum/{{.forum.ID}}">Delete Group</a></div>
+        {{end}}
+        </div>
+        <div>
+            <a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a>
+        </div>
+        <div class="container-sm">
+        {{if .threads}}
+            {{range .threads}}
+                <div ><a href="/thread/{{.ID}}">{{.Title}}</a></div>
+            {{end}}
+        {{else}}
+            <div class="noevents pt-5"><h1>No Events yet.</h1></div>
+        {{end}}
         </div>
     </div>
 
