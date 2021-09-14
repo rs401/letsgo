@@ -21,7 +21,7 @@ type ForumHandler struct{}
 func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
-
+	log.Printf("email is: %v", email)
 	db := models.DBConn
 	redisClient := models.RedisClient
 	var forums []models.Forum
@@ -73,7 +73,6 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
 
-	db := models.DBConn
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "forum.html", gin.H{
@@ -82,21 +81,83 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		})
 		return
 	}
+
+	db := models.DBConn
+	// Check redis
+	redisClient := models.RedisClient
 	var forum models.Forum
-	db.Preload("Threads").Preload("User").Find(&forum, id)
-	if forum.ID == 0 {
-		c.HTML(http.StatusNotFound, "forum.html", gin.H{
-			"message": "notfound",
+	val, err := redisClient.Get(c, fmt.Sprintf("forum%v", c.Param("id"))).Result()
+	// If redis nil, get from db and set in redis
+	if err == redis.Nil {
+		log.Printf("==== Not cached, Querying db")
+		result := db.Preload("Threads").Preload("User").Order("created_at desc").Find(&forum, id)
+		if result.Error != nil {
+			session.AddFlash("Internal Error")
+			log.Printf("==== Error Querying db")
+			c.HTML(http.StatusInternalServerError, "forum.html", gin.H{
+				"error":   "Internal Error",
+				"flashes": session.Flashes(),
+				"user":    email,
+			})
+			session.Save()
+			return
+		}
+		if forum.ID == 0 {
+			session.AddFlash("Not found.")
+			c.HTML(http.StatusNotFound, "forum.html", gin.H{
+				"message": "notfound",
+				"user":    email,
+				"flashes": session.Flashes(),
+			})
+			session.Save()
+			return
+		}
+		data, _ := json.Marshal(forum)
+		redisClient.Set(c, "forum"+c.Param("id"), string(data), 0)
+		c.HTML(http.StatusOK, "forum.html", gin.H{
+			"forum":      forum,
+			"forum.User": forum.User,
+			"threads":    forum.Threads,
+			"user":       email,
+		})
+		return
+	} else if err != nil {
+		// Else if != nil, internal error
+		session.AddFlash("Internal Error")
+		c.HTML(http.StatusInternalServerError, "forum.html", gin.H{
+			"error":   "Internal Error",
+			"flashes": session.Flashes(),
 			"user":    email,
+		})
+		session.Save()
+		return
+	} else {
+		// Else get it from redis
+		log.Printf("==== Request to Redis")
+		json.Unmarshal([]byte(val), &forum)
+		c.HTML(http.StatusOK, "forum.html", gin.H{
+			"forum":      forum,
+			"forum.User": forum.User,
+			"threads":    forum.Threads,
+			"user":       email,
 		})
 		return
 	}
-	c.HTML(http.StatusOK, "forum.html", gin.H{
-		"forum":      forum,
-		"forum.User": forum.User,
-		"threads":    forum.Threads,
-		"user":       email,
-	})
+
+	// db.Preload("Threads").Preload("User").Find(&forum, id)
+	// if forum.ID == 0 {
+	// 	c.HTML(http.StatusNotFound, "forum.html", gin.H{
+	// 		"message": "notfound",
+	// 		"user":    email,
+	// 	})
+	// 	return
+	// }
+	// c.HTML(http.StatusOK, "forum.html", gin.H{
+	// 	"forum":      forum,
+	// 	"forum.User": forum.User,
+	// 	"threads":    forum.Threads,
+	// 	"user":       email,
+	// })
 }
 
 func (handler *ForumHandler) NewForumHandler(c *gin.Context) {

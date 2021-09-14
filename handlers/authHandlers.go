@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -65,7 +63,7 @@ func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		session := sessions.Default(c)
 		sessionToken := session.Get("token")
 		if sessionToken == nil {
-			c.String(http.StatusForbidden, "Not signed in")
+			c.Redirect(http.StatusFound, "/login")
 			c.Abort()
 		}
 
@@ -92,13 +90,16 @@ func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
 
 func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	if c.Request.Method == "GET" {
-		state = randToken()
+		// state = randToken()
+		state = uuid.NewString()
 		session := sessions.Default(c)
 		session.Set("state", state)
-		session.Save()
+		email := fmt.Sprintf("%v", session.Get("email"))
 		url := getLoginURL(state)
+		session.Save()
 		c.HTML(http.StatusOK, "login.html", gin.H{
 			"gurl": url,
+			"user": email,
 		})
 		return
 	}
@@ -140,16 +141,16 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	session.Set("email", user.Email)
 	session.Set("token", sessionToken)
 	session.AddFlash("User signed in")
-	session.Save()
 
 	c.Redirect(http.StatusFound, "/")
+	session.Save()
 }
 
-func randToken() string {
-	b := make([]byte, 32)
-	rand.Read(b)
-	return base64.StdEncoding.EncodeToString(b)
-}
+// func randToken() string {
+// 	b := make([]byte, 32)
+// 	rand.Read(b)
+// 	return base64.StdEncoding.EncodeToString(b)
+// }
 
 func getLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
@@ -157,8 +158,9 @@ func getLoginURL(state string) string {
 
 func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	if callbackState := session.Get("state"); callbackState != c.Query("state") {
-		c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("invalid session state: %s", callbackState))
+	callbackState := session.Get("state")
+	if fmt.Sprintf("%v", callbackState) != c.Query("state") {
+		c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("invalid session state: got: %v Type: %T\n  Expected: %v", callbackState, callbackState, c.Query("state")))
 		return
 	}
 
@@ -205,9 +207,9 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	session.Set("email", user.Email)
 	session.Set("token", sessionToken)
 	session.AddFlash("User signed in")
+	session.Save()
 
 	c.Redirect(http.StatusTemporaryRedirect, "/")
-	session.Save()
 }
 
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
@@ -273,8 +275,9 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
 	session := sessions.Default(c)
+	session.Delete("user")
 	session.Clear()
-	session.AddFlash("Signed out.")
-	c.Redirect(http.StatusFound, "/login")
+	session.Options(sessions.Options{MaxAge: -1})
 	session.Save()
+	c.Redirect(http.StatusFound, "/login")
 }

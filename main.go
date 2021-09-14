@@ -69,9 +69,6 @@ func main() {
 	r.StaticFile("/favicon.ico", "./favicon.ico")
 	r.LoadHTMLGlob("templates/*")
 
-	// Errors
-	// r.NoRoute(mainHandler.ErrorHandler)
-
 	r.GET("/", mainHandler.IndexHandler)
 	r.GET("/forums", forumHandler.GetForumsHandler)
 	r.GET("/login", authHandler.LoginHandler)
@@ -95,6 +92,8 @@ func main() {
 		authorized.GET("/new_thread/:fid", threadHandler.NewThreadHandler)
 		authorized.POST("/new_thread/:fid", threadHandler.NewThreadHandler)
 		authorized.GET("/thread/:id", threadHandler.GetThreadHandler)
+		authorized.GET("/update_thread/:id", threadHandler.UpdateThreadHandler)
+		authorized.POST("/update_thread/:id", threadHandler.UpdateThreadHandler)
 
 		authorized.GET("/new_post/:tid", postHandler.NewPostHandler)
 		authorized.POST("/new_post/:tid", postHandler.NewPostHandler)

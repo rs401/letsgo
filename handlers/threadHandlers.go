@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -63,6 +64,7 @@ func (handler *ThreadHandler) GetThreadHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "thread.html", gin.H{
 		"user":   email,
 		"thread": thread,
+		"date":   thread.Date.Format("2006, Jan 02"),
 		"posts":  thread.Posts,
 	})
 }
@@ -87,8 +89,10 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	newThread := new(models.NewThread)
 	if err := c.Bind(&newThread); err != nil {
 		session.AddFlash("Bad Request")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+		c.HTML(http.StatusBadRequest, "new_thread.html", gin.H{
+			"user": email,
+			"fid":  fid,
+			"csrf": fmt.Sprintf("%v", session.Get("csrf")),
 		})
 		session.Save()
 		return
@@ -97,8 +101,10 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	var forum models.Forum
 	db.Find(&forum, fid)
 	if forum.ID == 0 {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "Forum doesn't exist",
+		c.HTML(http.StatusNotFound, "new_thread.html", gin.H{
+			"user": email,
+			"fid":  fid,
+			"csrf": fmt.Sprintf("%v", session.Get("csrf")),
 		})
 		return
 	}
@@ -106,12 +112,10 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	forumId, _ := strconv.Atoi(fid)
 	if strings.TrimSpace(newThread.Title) == "" || strings.TrimSpace(newThread.Body) == "" {
 		session.AddFlash("Title and Body cannot be empty.")
-		csrf := uuid.NewString()
-		session.Set("csrf", csrf)
 		c.HTML(http.StatusBadRequest, "new_thread.html", gin.H{
 			"user":    email,
 			"fid":     fid,
-			"csrf":    csrf,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
 		session.Save()
@@ -129,6 +133,9 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	if result.Error != nil {
 		log.Printf("Error: %v", result.Error)
 	}
+	log.Println("==== Clearing Redis")
+	redisClient := models.RedisClient
+	redisClient.Del(c, fmt.Sprintf("forum%v", fid))
 	c.Redirect(http.StatusFound, "/forums/"+fid)
 }
 
@@ -145,45 +152,145 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 // 	return c.SendString("Thread successfully Deleted from database.")
 // }
 
-// func UpdateThread(c *gin.Context)  {
-// 	db := models.DBConn
-// 	id := c.Param("id")
-// 	var oldThread models.Thread
-// 	var updThread = new(models.Thread)
-// 	db.First(&oldThread, id)
-// 	// Check forum exists
-// 	fid := oldThread.ForumID
-// 	var forum models.Forum
-// 	db.Find(&forum, fid)
-// 	if forum.Name == "" {
-// 		return c.Status(418).SendString("Forum doesn't exist")
-// 	}
+func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	email := fmt.Sprintf("%v", session.Get("email"))
+	user := getUserByEmail(email)
+	id := c.Param("id")
+	db := models.DBConn
+	var oldThread models.Thread
+	var updThread = new(models.UpdateThread)
+	db.Preload("User").Find(&oldThread, id)
+	if oldThread.ID == 0 {
+		session.AddFlash("Invalid path")
+		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+			"user":    email,
+			"id":      id,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		log.Printf("Invalid Forum ID. user: %s", email)
+		return
+	}
 
-// 	if oldThread.Title == "" {
-// 		return c.Status(500).SendString("Thread does not exist in the database.")
-// 	}
-// 	if err := c.BodyParser(updThread); err != nil {
-// 		return c.Status(503).SendString(err.Error())
-// 	}
-// 	theId, idErr := strconv.Atoi(id)
-// 	if idErr != nil {
-// 		return c.Status(422).SendString(idErr.Error())
-// 	}
-// 	updThread.ID = uint(theId)
-// 	if title := strings.TrimSpace(updThread.Title); title == "" {
-// 		updThread.Title = oldThread.Title
-// 	}
-// 	if body := strings.TrimSpace(updThread.Body); body == "" {
-// 		updThread.Body = oldThread.Body
-// 	}
-// 	if userid := updThread.UserID; userid == 0 {
-// 		updThread.UserID = oldThread.UserID
-// 	}
-// 	if forumid := updThread.ForumID; forumid == 0 {
-// 		updThread.ForumID = oldThread.ForumID
-// 	}
+	if c.Request.Method == "GET" {
+		csrf := uuid.NewString()
+		session.Set("csrf", csrf)
+		c.HTML(http.StatusOK, "update_thread.html", gin.H{
+			"user":   email,
+			"id":     id,
+			"csrf":   csrf,
+			"thread": oldThread,
+		})
+		session.Save()
+		return
+	}
 
-// 	db.Save(&updThread)
+	// Check forum exists
+	// fid := oldThread.ForumID
+	// var forum models.Forum
+	// db.Find(&forum, fid)
+	// if forum.ID == 0 {
+	// 	session.AddFlash("Invalid input")
+	// 	c.HTML(http.StatusTeapot, "update_thread.html", gin.H{
+	// 		"user":    email,
+	// 		"id":      id,
+	// 		"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+	// 		"flashes": session.Flashes(),
+	// 	})
+	// 	session.Save()
+	// 	log.Printf("Invalid Forum ID. user: %f", email)
+	// 	return
+	// }
 
-// 	return c.JSON(updThread)
-// }
+	// Get updated thread
+	title := c.PostForm("title")
+	body := c.PostForm("body")
+	date := c.PostForm("date")
+	Csrf := c.PostForm("csrf")
+	if strings.TrimSpace(title) == "" || strings.TrimSpace(body) == "" || strings.TrimSpace(date) == "" {
+		session.AddFlash("Invalid input")
+		session.AddFlash("All fields must not be empty.")
+		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+			"user":    email,
+			"id":      id,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		return
+	}
+	// if err := c.Bind(updThread); err != nil {
+	// 	session.AddFlash("Invalid input")
+	// 	session.AddFlash("could not bind data")
+	// 	c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+	// 		"user":    email,
+	// 		"id":      id,
+	// 		"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+	// 		"flashes": session.Flashes(),
+	// 	})
+	// 	session.Save()
+	// 	return
+	// }
+	const shortform = "2006-01-02"
+	parsedDate, err := time.Parse(shortform, date)
+	if err != nil {
+		log.Printf("couldn't parse date from form: %v", err)
+	}
+	updThread.Title = title
+	updThread.Body = body
+	updThread.Date = parsedDate
+	updThread.Csrf = Csrf
+
+	// Check CSRF
+	if updThread.Csrf != fmt.Sprintf("%v", session.Get("csrf")) {
+		session.AddFlash("Cross Site Request Forgery")
+		log.Println("==== CSRF did not match")
+		log.Printf("==== %v", session.Get("email"))
+		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+			"user":    email,
+			"id":      id,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		return
+	}
+
+	if strings.TrimSpace(updThread.Title) == "" || strings.TrimSpace(updThread.Body) == "" {
+		session.AddFlash("Invalid input")
+		session.AddFlash("Title and Description cannot be empty.")
+		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+			"user":    email,
+			"id":      id,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		return
+	}
+
+	// Check user is owner
+	if oldThread.User.Email != user.Email {
+		session.AddFlash("Unauthorized")
+		log.Printf("oldThread.User.Email: %s, user.Email: %s", oldThread.User.Email, user.Email)
+		c.HTML(http.StatusUnauthorized, "update_thread.html", gin.H{
+			"user":    email,
+			"id":      id,
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		return
+	}
+	// Update the thread/event
+	oldThread.Title = updThread.Title
+	oldThread.Body = updThread.Body
+	oldThread.Date = updThread.Date
+
+	db.Save(&oldThread)
+	log.Println("==== Clearing Redis")
+	redisClient := models.RedisClient
+	redisClient.Del(c, fmt.Sprintf("forum%v", oldThread.ForumID))
+	c.Redirect(http.StatusFound, fmt.Sprintf("/thread/%v", id))
+}

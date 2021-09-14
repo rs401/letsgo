@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -15,9 +16,11 @@ func (handler *MainHandler) IndexHandler(c *gin.Context) {
 	var forums []models.Forum
 	db.Find(&forums)
 	session := sessions.Default(c)
+	email := fmt.Sprintf("%v", session.Get("email"))
 	if session.Get("email") == nil {
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"forums": forums,
+			"user":   email,
 		})
 		return
 	}
