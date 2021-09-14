@@ -95,11 +95,13 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 		state = randToken()
 		session := sessions.Default(c)
 		session.Set("state", state)
-		session.Save()
+		email := fmt.Sprintf("%v", session.Get("email"))
 		url := getLoginURL(state)
 		c.HTML(http.StatusOK, "login.html", gin.H{
 			"gurl": url,
+			"user": email,
 		})
+		session.Save()
 		return
 	}
 	var loginUser models.LoginUser
@@ -273,7 +275,9 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
 	session := sessions.Default(c)
+	session.Delete("user")
+	// session.Clear()
+	session.Options(sessions.Options{MaxAge: -1})
 	session.Save()
-	session.Clear()
 	c.Redirect(http.StatusFound, "/login")
 }
