@@ -4,14 +4,20 @@
     {{range .flashes}}
     <div class="alert alert-info">{{.}}</div>
     {{end}}
-    <div class="container-md forums border border-5 rounded ">
-        <div class="container-sm thread my-2">
-            <div class="op">Op: {{ .thread.User.DisplayName}}
-            {{ if eq .thread.User.Email .user}}
-                <a href="/update_thread/{{.thread.ID}}">Edit Event</a> | <a href="/del_thread/{{.thread.ID}}">Delete Event</a>
-            {{end}}
+    <div class="container-md border border-5 rounded ">
+        <div class="container-sm thread my-2 border-bottom border-2">
+            <div class="op">Op: {{ .thread.User.DisplayName}}<br/>
+                {{ if eq .thread.User.Email .user}}
+                <div>
+                    <a href="/update_thread/{{.thread.ID}}">Edit Event</a> | <a href="/del_thread/{{.thread.ID}}">Delete Event</a>
+                </div>
+                {{end}}
+                <div>
+                    <sub class="small">Event Date:<br/>{{ .date }}</sub>
+                </div>
             </div>
-            <div>{{ .thread.Body}}</div>
+            <div class="badge">Event Description</div>
+            <div class="ms-5">{{.thread.Body}}</div>
         </div>
         <div>
             <a href="/new_post/{{.thread.ID}}">New Post</a>

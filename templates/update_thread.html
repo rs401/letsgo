@@ -3,7 +3,7 @@
     <div class=" mx-auto">
         <h1>Edit</h1>
         <div class="col">
-            <form method="POST" action="/update_forum/{{.id}}">
+            <form method="POST" action="/update_thread/{{.id}}">
             {{range .flashes}}
             <div class="alert alert-info">{{.}}</div>
             {{end}}
@@ -13,7 +13,7 @@
                     <label for="body" class="form-label">Event Description</label>
                     <textarea class="form-control" id="body" name="body" aria-describedby="bodyHelp">{{.thread.Body}}</textarea>
                     <label for="date" class="form-label">Event Date</label>
-                    <input type="datetime-local" class="form-control" id="date" name="date" aria-describedby="dateHelp" value="{{.thread.Date}}">
+                    <input type="date" class="form-control" id="date" name="date" aria-describedby="dateHelp" value="{{.thread.Date}}">
                     <input type="hidden" id="csrf" name="csrf" value="{{.csrf}}">
                 </div>
                 <button type="submit" class="btn btn-primary">Update</button>
