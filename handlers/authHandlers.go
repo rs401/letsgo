@@ -65,7 +65,7 @@ func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		session := sessions.Default(c)
 		sessionToken := session.Get("token")
 		if sessionToken == nil {
-			c.String(http.StatusForbidden, "Not signed in")
+			c.Redirect(http.StatusFound, "/login")
 			c.Abort()
 		}
 
@@ -140,9 +140,9 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	session.Set("email", user.Email)
 	session.Set("token", sessionToken)
 	session.AddFlash("User signed in")
-	session.Save()
 
 	c.Redirect(http.StatusFound, "/")
+	session.Save()
 }
 
 func randToken() string {
@@ -273,8 +273,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	session.Clear()
-	session.AddFlash("Signed out.")
-	c.Redirect(http.StatusFound, "/login")
 	session.Save()
+	session.Clear()
+	c.Redirect(http.StatusFound, "/login")
 }
