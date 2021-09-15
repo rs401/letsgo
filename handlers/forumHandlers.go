@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -202,7 +203,18 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 		session.Save()
 		return
 	}
+	if strings.TrimSpace(newForum.Name) == "" || strings.TrimSpace(newForum.Description) == "" {
+		session.AddFlash("Name and Description must not be empty.")
+		c.HTML(http.StatusOK, "new_forum.html", gin.H{
+			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		return
+	}
 	forum.Name = newForum.Name
+	forum.Description = newForum.Description
 	forum.User = *user
 	result := db.Create(&forum)
 	if result.Error != nil {
@@ -371,11 +383,14 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		return
 	}
 	// Check not empty string
-	if updForum.Name == "" {
+	if updForum.Name == "" || updForum.Description == "" {
 		session.AddFlash("Bad Request")
+		session.AddFlash("Name and Description must not be empty.")
 		c.HTML(http.StatusBadRequest, "update_forum.html", gin.H{
 			"message": "badrequest",
 			"user":    email,
+			"id":      id,
+			"forum":   forum,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
@@ -384,6 +399,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	}
 	if forum.User.Email != user.Email {
 		session.AddFlash("Forbidden")
+		log.Printf("Unauthorized update attempt: %s", user.Email)
 		c.HTML(http.StatusForbidden, "update_forum.html", gin.H{
 			"message": "forbidden",
 			"flashes": session.Flashes(),
