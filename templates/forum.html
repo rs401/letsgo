@@ -1,15 +1,20 @@
 {{template "head.html" . }}
 
-    <h1>{{ .forum.Name }}</h1> 
     {{range .flashes}}
     <div class="alert alert-info">{{.}}</div>
     {{end}}
-    <div class="container-md forums border border-2 rounded ">
-        <div class="container-sm forum my-2">
-        <div>Owner: {{ .forum.User.Email}}</div>
-        {{ if eq .forum.User.Email .user }}
-            <div>{{.forum.Name}} <a href="/update_forum/{{.forum.ID}}">Edit Group</a> | <a href="/del_forum/{{.forum.ID}}">Delete Group</a></div>
-        {{end}}
+    <div class="container-md category  rounded ">
+        <div class="container-sm category-title my-2">
+            <h1>{{.forum.Name}}</h1>
+        </div>
+        <div class="container-sm forum-row my-2">
+            <div class="forum-description forum-column">
+                <h4><a href="forums/{{.ID}}">{{.Name}}</a></h4>
+                <p>{{.Description}}</p>
+            </div>
+            {{ if eq .forum.User.Email .user }}
+                <div><a href="/update_forum/{{.forum.ID}}">Edit Group</a> | <a href="/del_forum/{{.forum.ID}}">Delete Group</a></div>
+            {{end}}
         </div>
         <div>
             <a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a>
@@ -17,7 +22,15 @@
         <div class="container-sm">
         {{if .threads}}
             {{range .threads}}
-                <div ><a href="/thread/{{.ID}}">{{.Title}}</a></div>
+                <div class="thread-row">
+                    <div class="forum-icon forum-column center"></div>
+                    <div class="forum-description forum-column">
+                        <h4><a href="/thread/{{.ID}}">{{.Title}}</a></h4>
+                        <p>{{.Body}}</p>
+                    </div>
+                    <div class="forum-stats forum-column center"></div>
+                    <div class="forum-info forum-column"></div>
+                </div>
             {{end}}
         {{else}}
             <div class="noevents pt-5"><h1>No Events yet.</h1></div>
