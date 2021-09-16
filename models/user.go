@@ -24,9 +24,11 @@ type NewUser struct {
 	Email       string `json:"email"`
 	Pass1       string `json:"pass1"`
 	Pass2       string `json:"pass2"`
+	Csrf        string `json:"csrf" form:"csrf"`
 }
 
 type LoginUser struct {
 	Email string `json:"email"`
 	Pass1 string `json:"pass1"`
+	Csrf  string `json:"csrf" form:"csrf"`
 }
