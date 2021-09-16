@@ -32,6 +32,24 @@ body {
     background-color: #fff4e6;
 }
 
+.login {
+    max-width: 600px;
+}
+
+i{
+    color: #854442;
+}
+
+.btn-primary {
+    background-color: #854442;
+    border-color: #854442;
+    padding-bottom: 5px;
+}
+.btn-primary:hover {
+    background-color: #4b3832;
+    border-color: #fff4e6;
+}
+
 
 /* ########################################### */
 /*           Forums.html                       */
@@ -50,7 +68,9 @@ body {
     padding: 5px;
     border-radius: 5px;
     margin:4px;
+    color: #854442;
     background-color:#fff;
+    border: 5px solid #fff4e6;
 }
 
 .forum-row{
@@ -104,7 +124,7 @@ header{
 .nav-item a{
     float: right;
     display:block;
-    text-align: center;
+    /* text-align: center; */
     font-size: 20px;
     color:#222;
 }

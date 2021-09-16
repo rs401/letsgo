@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -30,7 +31,6 @@ type GUser struct {
 }
 
 var conf *oauth2.Config
-var state string
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -89,28 +89,35 @@ func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
 }
 
 func (handler *AuthHandler) LoginHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	var state, email string
 	if c.Request.Method == "GET" {
-		// state = randToken()
 		state = uuid.NewString()
-		session := sessions.Default(c)
-		session.Set("state", state)
-		email := fmt.Sprintf("%v", session.Get("email"))
+		email = fmt.Sprintf("%v", session.Get("email"))
 		url := getLoginURL(state)
+		csrf := uuid.NewString()
+		session.Set("state", state)
+		session.Set("csrf", csrf)
 		session.Save()
 		c.HTML(http.StatusOK, "login.html", gin.H{
 			"gurl": url,
 			"user": email,
+			"csrf": csrf,
 		})
 		return
 	}
 	var loginUser models.LoginUser
-	session := sessions.Default(c)
 
 	if err := c.Bind(&loginUser); err != nil {
 		session.AddFlash("Invalid Input")
+		state = fmt.Sprintf("%v", session.Get("state"))
+		url := getLoginURL(state)
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
 			"error":   "Invalid input",
 			"flashes": session.Flashes(),
+			"gurl":    url,
+			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 		})
 		session.Save()
 		return
@@ -119,8 +126,25 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	user := getUserByEmail(loginUser.Email)
 	if user == nil {
 		session.AddFlash("Email/Password Incorrect")
+		url := getLoginURL(state)
 		c.HTML(http.StatusBadRequest, "login.html", gin.H{
 			"message": "email/password incorrect",
+			"flashes": session.Flashes(),
+			"gurl":    url,
+			"user":    email,
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+		})
+		session.Save()
+		return
+	}
+
+	// Check CSRF
+	if fmt.Sprintf("%v", session.Get("csrf")) != loginUser.Csrf {
+		session.AddFlash("Cross Site Request Forgery")
+		log.Println("==== CSRF did not match")
+		log.Printf("==== %v", session.Get("email"))
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
 		session.Save()
@@ -213,20 +237,24 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 }
 
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
+	session := sessions.Default(c)
 	if c.Request.Method == "GET" {
+		csrf := uuid.NewString()
+		session.Set("csrf", csrf)
 		c.HTML(http.StatusOK, "register.html", gin.H{
 			"message": "register",
+			"csrf":    csrf,
 		})
 		return
 	}
 	var newUser models.NewUser
-	session := sessions.Default(c)
 
 	if err := c.Bind(&newUser); err != nil {
 		session.AddFlash("invalid input")
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"error":   "invalid input",
 			"flashes": session.Flashes(),
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 		})
 		session.Save()
 		return
@@ -237,6 +265,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"error":   "email already exists in database",
 			"flashes": session.Flashes(),
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 		})
 		session.Save()
 		return
@@ -247,10 +276,36 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"error":   "Passwords do not match.",
 			"flashes": session.Flashes(),
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 		})
 		session.Save()
 		return
 	}
+	// Check DisplayName not empty
+	if newUser.DisplayName == "" {
+		session.AddFlash("Display Name cannot be empty.")
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"error":   "displayname empty",
+			"flashes": session.Flashes(),
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+		})
+		session.Save()
+		return
+	}
+
+	// Check CSRF
+	if fmt.Sprintf("%v", session.Get("csrf")) != newUser.Csrf {
+		session.AddFlash("Cross Site Request Forgery")
+		log.Println("==== CSRF did not match")
+		log.Printf("==== %v", session.Get("email"))
+		c.HTML(http.StatusOK, "register.html", gin.H{
+			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
+			"flashes": session.Flashes(),
+		})
+		session.Save()
+		return
+	}
+
 	password, err := bcrypt.GenerateFromPassword([]byte(newUser.Pass1), 14)
 	if err != nil {
 		fmt.Println("=========== Houston, we have a problem")
@@ -270,7 +325,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 	models.DBConn.Create(&user)
 
-	c.Redirect(http.StatusFound, "login.html")
+	c.Redirect(http.StatusFound, "/login")
 }
 
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
