@@ -114,7 +114,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 			return
 		}
 		data, _ := json.Marshal(forum)
-		redisClient.Set(c, "forum"+c.Param("id"), string(data), 0)
+		redisClient.Set(c, fmt.Sprintf("forum%v", c.Param("id")), string(data), 0)
 		c.HTML(http.StatusOK, "forum.html", gin.H{
 			"forum":      forum,
 			"forum.User": forum.User,
@@ -423,10 +423,11 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	}
 	// Update forum and save
 	forum.Name = updForum.Name
+	forum.Description = updForum.Description
 	db.Save(&forum)
 	log.Println("==== Clearing Redis")
 	redisClient := models.RedisClient
-	redisClient.Del(c, "forums")
+	redisClient.Del(c, fmt.Sprintf("forum%v", c.Param("id")))
 
 	c.Redirect(http.StatusFound, "/forums/"+c.Param("id"))
 }

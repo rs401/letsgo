@@ -13,7 +13,7 @@ type Thread struct {
 	Date    time.Time `json:"date" `
 	UserID  uint      `json:"userid" gorm:"not null"`
 	User    User
-	ForumID uint `json:"forum_id" gorm:"not null"`
+	ForumID uint `json:"forum_id" gorm:"constraint:OnDelete:CASCADE;"`
 	Forum   Forum
 	Posts   []Post `json:""`
 }
