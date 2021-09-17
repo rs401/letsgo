@@ -9,8 +9,7 @@
         </div>
         <div class="container-sm forum-row my-2">
             <div class="forum-description forum-column">
-                <h4><a href="forums/{{.ID}}">{{.Name}}</a></h4>
-                <p>{{.Description}}</p>
+                <p>{{.forum.Description}}</p>
             </div>
             {{ if eq .forum.User.Email .user }}
                 <div><a href="/update_forum/{{.forum.ID}}">Edit Group</a> | <a href="/del_forum/{{.forum.ID}}">Delete Group</a></div>

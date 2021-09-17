@@ -61,6 +61,10 @@ func Config(key string) string {
 func main() {
 	r := gin.Default()
 
+	if Config("GIN_MODE") == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	store, _ := redisStore.NewStore(10, "tcp", Config("REDIS_HOST")+":"+Config("REDIS_PORT"), "", []byte(Config("SECRET")))
 	store.Options(sessions.Options{MaxAge: 3600})
 	r.Use(sessions.Sessions("letsgo_api", store))
