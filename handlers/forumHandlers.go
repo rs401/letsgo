@@ -22,7 +22,6 @@ type ForumHandler struct{}
 func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
-	log.Printf("email is: %v", email)
 	db := models.DBConn
 	redisClient := models.RedisClient
 	var forums []models.Forum
