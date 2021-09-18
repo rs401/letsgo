@@ -97,7 +97,7 @@ func (handler *PostHandler) NewPostHandler(c *gin.Context) {
 		session.Save()
 		return
 	}
-	// Check forum exists
+	// Check thread exists
 	var thread models.Thread
 	db.Find(&thread, tid)
 	if thread.ID == 0 {

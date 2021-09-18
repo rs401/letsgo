@@ -81,13 +81,31 @@ i{
     margin-top: 1rem;
 }
 
-.thread-row{
+.thread-rows{
     display: grid;
-    grid-template-columns: 7% 60% 13% 20%;
+    /* grid-template-columns: 7% 60% 13% 20%; */
     background-color:#fff;
     border-left: 10px dashed #4b3832;
     border-right: 10px dashed #4b3832;
+    border-top: 2px solid #fff4e6;
+    border-bottom: 2px solid #fff4e6;
     margin-top: 1rem;
+}
+
+.thread-row{
+    display: grid;
+    color: #fff4e6;
+    grid-template-columns: 15% 85%;
+    background-color: #854442;
+    border-bottom: 2px solid #fff4e6;
+}
+
+.thread-column{
+    padding: 10px;
+    margin:4px;
+    border-radius: 5px;
+    border-left: 2px solid rgb(0,0,0,0.5);
+    border-right: 2px solid rgb(0,0,0,0.5);
 }
 
 .forum-column{

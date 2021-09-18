@@ -51,7 +51,7 @@ func (handler *ThreadHandler) GetThreadHandler(c *gin.Context) {
 	}
 
 	var thread models.Thread
-	db.Preload("Posts").Preload("User").Find(&thread, id)
+	db.Preload("Posts").Preload("Posts.User").Preload("User").Find(&thread, id)
 	if thread.ID == 0 {
 		session.AddFlash("Thread does not exist in the database.")
 		c.HTML(http.StatusNotFound, "thread.html", gin.H{
