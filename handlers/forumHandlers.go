@@ -83,9 +83,35 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	}
 
 	db := models.DBConn
+	var forum models.Forum
+	user := getUserByEmail(email)
+	db.Preload("User").Find(&forum, id)
+
+	// Check if forum is Open
+	if !forum.Open {
+		// If not Open, see if User is a member
+		if !models.IsMember(uint(id), user.ID) {
+			// If not member show a "Join group" form where the threads would be.
+			session.AddFlash("Not a member")
+			log.Printf("==== Not a member of group")
+			c.HTML(http.StatusOK, "forum.html", gin.H{
+				"error":   "Internal Error",
+				"flashes": session.Flashes(),
+				"user":    email,
+				"forum":   forum,
+				"id":      id,
+				"uid":     user.ID,
+				"member":  false,
+			})
+			session.Save()
+			return
+		}
+	}
+	// Set a flag in the response indicating member true/false.
+	// Else continue checking redis and whatnot
+
 	// Check redis
 	redisClient := models.RedisClient
-	var forum models.Forum
 	val, err := redisClient.Get(c, fmt.Sprintf("forum%v", c.Param("id"))).Result()
 	// If redis nil, get from db and set in redis
 	if err == redis.Nil {
@@ -215,6 +241,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	forum.Name = newForum.Name
 	forum.Description = newForum.Description
 	forum.User = *user
+	forum.Open = true
 	result := db.Create(&forum)
 	if result.Error != nil {
 		session.AddFlash("Internal Error")
@@ -345,7 +372,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	}
 	// Get original and apply updates
 	var forum models.Forum
-	var updForum = new(models.NewForum)
+	var updForum = new(models.UpdateForum)
 	res := db.Preload("User").Find(&forum, id)
 	if res.Error != nil {
 		session.AddFlash("Group not found")
@@ -370,17 +397,16 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		return
 	}
 	// Parse new values
-	if err := c.Bind(updForum); err != nil {
-		session.AddFlash("Bad Request")
-		c.HTML(http.StatusBadRequest, "update_forum.html", gin.H{
-			"message": "badrequest",
-			"user":    email,
-			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
-			"flashes": session.Flashes(),
-		})
-		session.Save()
-		return
+	updForum.Name = c.Request.FormValue("name")
+	updForum.Description = c.Request.FormValue("description")
+	updForum.Csrf = c.Request.FormValue("csrf")
+	open := c.Request.FormValue("open")
+	if open == "" {
+		updForum.Open = false
+	} else {
+		updForum.Open = true
 	}
+
 	// Check not empty string
 	if updForum.Name == "" || updForum.Description == "" {
 		session.AddFlash("Bad Request")
@@ -423,6 +449,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	// Update forum and save
 	forum.Name = updForum.Name
 	forum.Description = updForum.Description
+	forum.Open = updForum.Open
 	db.Save(&forum)
 	log.Println("==== Clearing Redis")
 	redisClient := models.RedisClient
