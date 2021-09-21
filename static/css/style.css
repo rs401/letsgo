@@ -81,6 +81,13 @@ i{
     margin-top: 1rem;
 }
 
+.forum-head{
+    display: flex;
+    background-color:#fff;
+    border-bottom: 5px dashed #4b3832;
+    margin-top: 1rem;
+}
+
 .thread-rows{
     display: grid;
     /* grid-template-columns: 7% 60% 13% 20%; */

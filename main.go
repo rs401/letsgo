@@ -1,18 +1,3 @@
-// Recipes API
-//
-// This is a sample recipes API. You can find out more about the API at https://github.com/rs401/letsgo/.
-//
-// Schemes: http
-// Host: 127.0.0.1:9000
-// BasePath: /
-// Version: 1.0.0
-//
-// Consumes:
-// - application/json
-//
-// Produces:
-// - application/json
-// swagger:meta
 package main
 
 import (
@@ -31,6 +16,7 @@ var authHandler *handlers.AuthHandler
 var forumHandler *handlers.ForumHandler
 var threadHandler *handlers.ThreadHandler
 var postHandler *handlers.PostHandler
+var memberHandler *handlers.MemberHandler
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -41,6 +27,7 @@ func init() {
 	mainHandler = &handlers.MainHandler{}
 	threadHandler = &handlers.ThreadHandler{}
 	postHandler = &handlers.PostHandler{}
+	memberHandler = &handlers.MemberHandler{}
 
 	// Seed some forums for testing
 	// bytesRead, _ := ioutil.ReadFile("words.txt")
@@ -58,12 +45,12 @@ func Config(key string) string {
 	return os.Getenv(key)
 }
 
-func main() {
-	r := gin.Default()
-
+func SetupServer() *gin.Engine {
 	if Config("GIN_MODE") == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	r := gin.Default()
 
 	store, _ := redisStore.NewStore(10, "tcp", Config("REDIS_HOST")+":"+Config("REDIS_PORT"), "", []byte(Config("SECRET")))
 	store.Options(sessions.Options{MaxAge: 3600})
@@ -102,7 +89,19 @@ func main() {
 		authorized.GET("/new_post/:tid", postHandler.NewPostHandler)
 		authorized.POST("/new_post/:tid", postHandler.NewPostHandler)
 
+		authorized.POST("/request_membership/:id", memberHandler.RequestMembershipHandler)
+		authorized.GET("/manage_members/:id", memberHandler.ManageMembersHandler)
+		authorized.POST("/add_member/:id", memberHandler.AddMemberHandler)
+		authorized.POST("/reject_member/:id", memberHandler.RejectMemberHandler)
+		authorized.POST("/remove_member/:id", memberHandler.RemoveMemberHandler)
+
 	}
 
-	r.RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
+	// r.RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
+
+	return r
+}
+
+func main() {
+	SetupServer().RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
 }

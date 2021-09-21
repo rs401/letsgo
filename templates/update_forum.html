@@ -9,12 +9,16 @@
             {{end}}
             <div class="mb-3">
                 <label for="name" class="form-label">Group Name</label>
-                <input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" value="{{.forum.Name}}">
+                <input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" value="{{.forum.Name}}" required>
                 <label for="description" class="form-label">Group Description</label>
-                <textarea class="form-control" id="description" name="description" aria-describedby="descriptionHelp">{{.forum.Description}}</textarea>
+                <textarea class="form-control" id="description" name="description" aria-describedby="descriptionHelp" required>{{.forum.Description}}</textarea>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="open" name="open" {{if .forum.Open}}checked{{end}}>
+                    <label class="form-check-label" for="open">Membership Open to All Users: {{.forum.Open}}</label>
+                </div>
                 <input type="hidden" id="csrf" name="csrf" value="{{.csrf}}">
             </div>
-                <button type="submit" class="btn btn-primary">Update</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </form>
         </div>
     </div>
