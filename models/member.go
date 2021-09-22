@@ -18,13 +18,13 @@ type PendingMember struct {
 	User    User
 }
 
-func IsMember(fid, uid uint) bool {
-	var members []Member
-	DBConn.Where("forum_id = ?", fid).Find(&members)
-	for _, member := range members {
-		if member.UserID == uid {
-			return true
-		}
-	}
-	return false
-}
+// func IsMember(fid, uid uint) bool {
+// 	var members []Member
+// 	DBConn.Where("forum_id = ?", fid).Find(&members)
+// 	for _, member := range members {
+// 		if member.UserID == uid {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }

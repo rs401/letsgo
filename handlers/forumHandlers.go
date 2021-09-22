@@ -90,7 +90,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	// Check if forum is Open
 	if !forum.Open {
 		// If not Open, see if User is a member
-		if !models.IsMember(uint(id), user.ID) {
+		if !IsMember(uint(id), user.ID) {
 			// If not member show a "Join group" form where the threads would be.
 			session.AddFlash("Not a member")
 			log.Printf("==== Not a member of group")
@@ -145,6 +145,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 			"forum.User": forum.User,
 			"threads":    forum.Threads,
 			"user":       email,
+			"member":     true,
 		})
 		return
 	} else if err != nil {
@@ -166,6 +167,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 			"forum.User": forum.User,
 			"threads":    forum.Threads,
 			"user":       email,
+			"member":     true,
 		})
 		return
 	}
@@ -184,6 +186,18 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	// 	"threads":    forum.Threads,
 	// 	"user":       email,
 	// })
+}
+
+func IsMember(fid, uid uint) bool {
+	var members []models.Member
+	db := models.DBConn
+	db.Where("forum_id = ?", fid).Find(&members)
+	for _, member := range members {
+		if member.UserID == uid {
+			return true
+		}
+	}
+	return false
 }
 
 func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
@@ -242,6 +256,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	forum.Description = newForum.Description
 	forum.User = *user
 	forum.Open = true
+	log.Printf("Created New Forum: %v", forum.Name)
 	result := db.Create(&forum)
 	if result.Error != nil {
 		session.AddFlash("Internal Error")
@@ -249,6 +264,11 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 		session.Save()
 		return
 	}
+	log.Printf("Adding user to member list")
+	var member *models.Member = new(models.Member)
+	member.ForumID = forum.ID
+	member.UserID = user.ID
+	db.Create(&member)
 	log.Println("==== Clearing Redis")
 	redisClient := models.RedisClient
 	redisClient.Del(c, "forums")
