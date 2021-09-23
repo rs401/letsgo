@@ -19,7 +19,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/rs401/letsgo">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="screenshot.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Let's GO</h3>
@@ -71,7 +71,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Let's GO Screen Shot][screenshot.png]](https://example.com)
 
 Here's a blank template to get started:
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**
@@ -80,8 +80,12 @@ Here's a blank template to get started:
 
 ### Built With
 
-* []()
-* []()
+* [Go](https://golang.org/)
+* [Gin](https://gin-gonic.com/)
+* [Gorm](https://gorm.io/)
+* [PostgreSQL](https://www.postgresql.org/)
+* [Redis](https://redis.io/)
+* [Docker](https://www.docker.com/)
 * []()
 
 
