@@ -71,7 +71,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Let's GO Screen Shot][screenshot.png]](https://example.com)
+![Let's GO Screen Shot][screenshot.png]
 
 Here's a blank template to get started:
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**
