@@ -1,5 +1,21 @@
 {{template "head.html" . }}
 
+    <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold">Let's Go</h1>
+        <i class="fa fa-search fa-4x" aria-hidden="true"></i>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4">
+                Find interesting events near you.<br/>
+                Find groups to attend events with.<br/>
+                <h4>OR</h4><br/>
+                Organize your own event.
+                
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="/register" type="button" class="btn btn-primary btn-lg px-4 gap-3">Create Free Account</a>
+            </div>
+        </div>
+    </div>
     <h1>Lets Go</h1> 
     <div class="forums">
     {{range .forums}}
