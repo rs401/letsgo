@@ -237,12 +237,18 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 }
 
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
+	var state string
 	session := sessions.Default(c)
 	if c.Request.Method == "GET" {
+		state = uuid.NewString()
+		url := getLoginURL(state)
 		csrf := uuid.NewString()
+		session.Set("state", state)
 		session.Set("csrf", csrf)
+		session.Save()
 		c.HTML(http.StatusOK, "register.html", gin.H{
 			"message": "register",
+			"gurl":    url,
 			"csrf":    csrf,
 		})
 		return
