@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	redisStore "github.com/gin-contrib/sessions/redis"
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs401/letsgo/handlers"
@@ -93,5 +94,6 @@ func SetupServer() *gin.Engine {
 }
 
 func main() {
-	SetupServer().RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
+	// SetupServer().RunTLS(":"+Config("API_PORT"), "./certs/localhost.crt", "./certs/localhost.key")
+	autotls.Run(SetupServer(), "letsgo.events", "www.letsgo.events")
 }

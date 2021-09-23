@@ -71,7 +71,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-![Let's GO Screen Shot][screenshot.png]
+![Let's GO Screen Shot](screenshot.png)
 
 Here's a blank template to get started:
 **To avoid retyping too much info. Do a search and replace with your text editor for the following:**
@@ -97,11 +97,10 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+This app can be deployed in docker.
+
+* Docker
+  
 
 ### Installation
 
@@ -113,7 +112,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 2. Install NPM packages
    ```sh
-   npm install
+   docker-compose up --build
    ```
 
 
@@ -121,9 +120,7 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+Create an account. Join a group. Create a group. Post an event. Attend an event. Live life with Joy.
 
 
 
