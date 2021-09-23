@@ -1,0 +1,75 @@
+{{template "head.html" . }}
+
+    {{range .flashes}}
+    <div class="alert alert-info">{{.}}</div>
+    {{end}}
+    <div class="container-md category rounded ">
+        <div class="container-sm category-title my-2">
+            <h1>{{.forum.Name}}</h1>
+        </div>
+        <div class="container-sm forum-head my-2">
+            <div class="forum-description forum-column">
+                <p>{{.forum.Description}}</p>
+            </div>
+            {{ if eq .forum.User.Email .user }}
+                <div>
+                    <a href="/update_forum/{{.forum.ID}}">Edit Group</a> 
+                    | <a href="/manage_members/{{.forum.ID}}">Manage Members</a>
+                    | <a href="/del_forum/{{.forum.ID}}">Delete Group</a>
+                </div>
+            {{end}}
+        </div>
+        <div class="container-sm">
+        {{if not .forum.Open}}
+            {{if not .member}}
+                <!-- Show 'join' form -->
+                <form method="POST" action="/request_membership/{{.id}}">
+                    <input type="hidden" name="uid" value="{{.uid}}">
+                    <button type="submit" class="btn btn-primary">Request to Join Group</button>
+                </form>
+            {{else}}
+                <div>
+                    <a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a>
+                </div>
+
+                {{if .threads}}
+                    {{range .threads}}
+                        <div class="forum-row">
+                            <div class="forum-icon forum-column center"></div>
+                            <div class="forum-description forum-column">
+                                <h4><a href="/thread/{{.ID}}">{{.Title}}</a></h4>
+                                <p>{{.Body}}</p>
+                            </div>
+                            <div class="forum-stats forum-column center"></div>
+                            <div class="forum-info forum-column"></div>
+                        </div>
+                    {{end}}
+                {{else}}
+                    <div class="noevents pt-5"><h1>No Events yet.</h1></div>
+                {{end}}
+            {{end}}
+        {{else}}
+            <div>
+                <a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a>
+            </div>
+
+            {{if .threads}}
+                {{range .threads}}
+                    <div class="forum-row">
+                        <div class="forum-icon forum-column center"></div>
+                        <div class="forum-description forum-column">
+                            <h4><a href="/thread/{{.ID}}">{{.Title}}</a></h4>
+                            <p>{{.Body}}</p>
+                        </div>
+                        <div class="forum-stats forum-column center"></div>
+                        <div class="forum-info forum-column"></div>
+                    </div>
+                {{end}}
+            {{else}}
+                <div class="noevents pt-5"><h1>No Events yet.</h1></div>
+            {{end}}
+        {{end}}
+        </div>
+    </div>
+
+{{template "foot.html" .}}
