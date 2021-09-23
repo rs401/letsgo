@@ -101,7 +101,7 @@ This is an example of how to list things you need to use the software and how to
 
 ### Installation
 
-1. Clone the repo
+1. Clone the letsgo
    ```sh
    git clone https://github.com/rs401/letsgo.git
    ```
@@ -166,19 +166,17 @@ Project Link: [https://github.com/rs401/letsgo](https://github.com/rs401/letsgo)
 
 
 
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/rs401/repo.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/rs401/letsgo.svg?style=for-the-badge
 [contributors-url]: https://github.com/rs401/letsgo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/rs401/repo.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/rs401/letsgo.svg?style=for-the-badge
 [forks-url]: https://github.com/rs401/letsgo/network/members
-[stars-shield]: https://img.shields.io/github/stars/rs401/repo.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/rs401/letsgo.svg?style=for-the-badge
 [stars-url]: https://github.com/rs401/letsgo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/rs401/repo.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/rs401/letsgo.svg?style=for-the-badge
 [issues-url]: https://github.com/rs401/letsgo/issues
-[license-shield]: https://img.shields.io/github/license/rs401/repo.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/rs401/letsgo.svg?style=for-the-badge
 [license-url]: https://github.com/rs401/letsgo/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/rs401
