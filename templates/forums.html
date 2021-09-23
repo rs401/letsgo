@@ -1,0 +1,28 @@
+{{template "head.html" . }}
+
+    {{range .flashes}}
+    <div class="alert alert-info">{{.}}</div>
+    {{end}}
+    <div>
+        <a class="btn btn-primary" href="/new_forum">Create New Group</a>
+    </div>
+    <div class="container-md category rounded ">
+    <div class="container-sm category-title my-2">
+        <h2>Category name</h2>
+    </div>
+    {{range .forums}}
+        <div class="forum-row">
+            <div class="forum-icon forum-column center">
+                <i class="fa fa-road center"></i>
+            </div>
+            <div class="forum-description forum-column">
+                <h4><a href="forums/{{.ID}}">{{.Name}}</a></h4>
+                <p>{{.Description}}</p>
+            </div>
+            <div class="forum-stats forum-column center"></div>
+            <div class="forum-info forum-column"></div>
+        </div>
+    {{end}}
+    </div>
+
+{{template "foot.html" .}}

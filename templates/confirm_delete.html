@@ -1,0 +1,10 @@
+{{template "head.html" . }}
+{{range .flashes}}
+<div class="alert alert-info">{{.}}</div>
+{{end}}
+<form method="POST" action="/del_forum/{{.id}}">
+    <input type="hidden" id="csrf" name="csrf" value="{{.csrf}}">
+    <button type="submit" class="btn btn-danger">CONFIRM DELETE</button>
+</form>
+
+{{template "foot.html" .}}

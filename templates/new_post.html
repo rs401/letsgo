@@ -1,0 +1,18 @@
+{{template "head.html" . }}
+
+    <h1>Reply to Event</h1> 
+    <div class="container-md forums border border-2 rounded p-3">
+        <form action="/new_post/{{.tid}}" method="post">
+            {{range .flashes}}
+            <div class="alert alert-info">{{.}}</div>
+            {{end}}
+            <div class="mb-3">
+                <label for="body" class="form-label">Message</label>
+                <textarea class="form-control" id="body" name="body" aria-describedby="bodyHelp"></textarea >
+                <input type="hidden" id="csrf" name="csrf" value="{{.csrf}}">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+{{template "foot.html" .}}

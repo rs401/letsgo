@@ -1,0 +1,37 @@
+{{template "head.html" . }}
+
+    {{range .flashes}}
+    <div class="alert alert-info">{{.}}</div>
+    {{end}}
+    <div class="container-md category rounded ">
+        <h3>Pending Members</h3>
+            {{range $pm := .pending_members}}
+            <div class="container-sm my-2">
+                <div class="forum-column center">
+                    {{$pm.User.DisplayName}}
+                    <form action="/add_member/{{$.fid}}" method="post">
+                        <input type="hidden" name="uid" value="{{$pm.ID}}">
+                        <button class="btn btn-primary" type="submit">Accept Member</button>
+                    </form>
+                    <form action="/reject_member/{{$.fid}}" method="post">
+                        <input type="hidden" name="uid" value="{{$pm.ID}}">
+                        <button class="btn btn-primary" type="submit">Reject Member</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        <h3>Members</h3>
+            {{range $mem := .members}}
+            <div class="container-sm my-2">
+                <div class="forum-column center">
+                    {{$mem.User.DisplayName}}
+                    <form action="/remove_member/{{$.fid}}" method="post">
+                        <input type="hidden" name="uid" value="{{$mem.ID}}">
+                        <button class="btn btn-primary" type="submit">Remove Member</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+    </div>
+
+{{template "foot.html" . }}
