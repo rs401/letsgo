@@ -29,16 +29,6 @@ func init() {
 	postHandler = &handlers.PostHandler{}
 	memberHandler = &handlers.MemberHandler{}
 
-	// Seed some forums for testing
-	// bytesRead, _ := ioutil.ReadFile("words.txt")
-	// file_content := string(bytesRead)
-	// words := strings.Split(file_content, "\n")
-	// db := models.DBConn
-	// for _, name := range words {
-	// 	forum := models.Forum{Name: name}
-	// 	db.Create(&forum)
-	// }
-
 }
 
 func Config(key string) string {
