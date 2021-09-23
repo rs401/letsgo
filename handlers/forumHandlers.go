@@ -171,21 +171,6 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		})
 		return
 	}
-
-	// db.Preload("Threads").Preload("User").Find(&forum, id)
-	// if forum.ID == 0 {
-	// 	c.HTML(http.StatusNotFound, "forum.html", gin.H{
-	// 		"message": "notfound",
-	// 		"user":    email,
-	// 	})
-	// 	return
-	// }
-	// c.HTML(http.StatusOK, "forum.html", gin.H{
-	// 	"forum":      forum,
-	// 	"forum.User": forum.User,
-	// 	"threads":    forum.Threads,
-	// 	"user":       email,
-	// })
 }
 
 func IsMember(fid, uid uint) bool {
