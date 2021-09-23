@@ -101,7 +101,9 @@ This is an example of how to list things you need to use the software and how to
 
 ### Installation
 
-1. Clone the letsgo
+
+1. Clone the repo
+
    ```sh
    git clone https://github.com/rs401/letsgo.git
    ```
@@ -180,3 +182,4 @@ Project Link: [https://github.com/rs401/letsgo](https://github.com/rs401/letsgo)
 [license-url]: https://github.com/rs401/letsgo/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/richard-stadnick-3b4ab53b/
+
