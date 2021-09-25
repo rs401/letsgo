@@ -110,7 +110,12 @@ This app can be deployed in docker.
    ```sh
    git clone https://github.com/rs401/letsgo.git
    ```
-2. Install NPM packages
+2. Setup Environment Variables
+   ```sh
+   mv env.sample .env
+   vim .env
+   ```
+3. Orchestrate containers
    ```sh
    docker-compose up --build
    ```
