@@ -30,7 +30,7 @@
     <a href="https://github.com/rs401/letsgo"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/rs401/letsgo">View Demo</a>
+    <a href="https://www.letsgo.events/">View Demo</a>
     ·
     <a href="https://github.com/rs401/letsgo/issues">Report Bug</a>
     ·
@@ -73,9 +73,9 @@
 
 ![Let's GO Screen Shot](screenshot.png)
 
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`rs401`, `letsgo`, `Res401`, `rich.stadnick#gmail`, `Let's GO`, `App to connect people for gatherings.`
+This is a side project I am working on during my last semester of a BS in Software Development.
+
+Let's Go started as a way or families to organize cookouts, birthday parties, family reunions, etc. Then I thought, any group of people might want to gather for &lt;insert reason&gt;. 
 
 
 ### Built With

@@ -50,7 +50,7 @@
             </form>
             <div class="text-end ms-2 gx-2">
             {{if ne .user "<nil>"}}
-                <a href="#" type="button" class="btn btn-outline-light">Account {{.user}}</a>&nbsp;
+                <a href="/account" type="button" class="btn btn-outline-light">Account {{.user}}</a>&nbsp;
                 <a href="/signout" type="button" class="btn btn-outline-light">Sign-out</a>
             {{else}}
                 <a href="/login" type="button" class="btn btn-outline-light">Login</a>&nbsp;
