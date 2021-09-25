@@ -39,7 +39,7 @@ func init() {
 	conf = &oauth2.Config{
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		RedirectURL:  "https://www.letsgo.events/auth-callback",
+		RedirectURL:  os.Getenv("GREDIRECT_URL"),
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 			"https://www.googleapis.com/auth/userinfo.profile",
