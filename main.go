@@ -94,5 +94,5 @@ func SetupServer() *gin.Engine {
 
 func main() {
 	r := SetupServer()
-	r.RunTLS(":"+Config("API_PORT"), "./le-ssl/letsencrypt/live/hupden.com/cert.pem", "./le-ssl/letsencrypt/live/hupden.com/privkey.pem")
+	r.RunTLS(":"+Config("API_PORT"), Config("CERT"), Config("KEY"))
 }
