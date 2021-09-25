@@ -16,9 +16,9 @@
     <title>Letsgo</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+    <nav class="navbar navbar-expand-lg navbar-dark nav-dark mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Letsgo</a>
+            <a class="navbar-brand" href="/"><img src="/static/img/default.svg" height="50" alt="Let's GO"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -28,34 +28,33 @@
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="/forums">Forums</a>
+                <a class="nav-link" href="/forums">Groups</a>
                 </li>
                 <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Dropdown
+                    Help
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="/login">Login</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li><a class="dropdown-item" href="#">Donate</a></li>
+                    <li><a class="dropdown-item" href="#">About</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    <li><a class="dropdown-item" href="#">Privacy Policy</a></li>
+                    <li><a class="dropdown-item" href="#">Terms of Use</a></li>
+                    <li><a class="dropdown-item" href="#">Disclaimer</a></li>
                 </ul>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link disabled">Disabled</a>
                 </li>
             </ul>
             <form class="d-flex">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <button class="btn btn-outline-light" type="submit">Search</button>
             </form>
             <div class="text-end ms-2 gx-2">
             {{if ne .user "<nil>"}}
                 <a href="#" type="button" class="btn btn-outline-light">Account {{.user}}</a>&nbsp;
-                <a href="/signout" type="button" class="btn btn-warning">Sign-out</a>
+                <a href="/signout" type="button" class="btn btn-outline-light">Sign-out</a>
             {{else}}
                 <a href="/login" type="button" class="btn btn-outline-light">Login</a>&nbsp;
-                <a href="/register" type="button" class="btn btn-warning">Sign-up</a>
+                <a href="/register" type="button" class="btn btn-outline-light">Sign-up</a>
             {{end}}
             </div>
             </div>
