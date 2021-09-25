@@ -19,7 +19,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/rs401/letsgo">
-    <img src="static/img/default.svg" alt="Logo" width="80" height="80">
+    <img src="static/img/default.svg" alt="Logo">
   </a>
 
   <h3 align="center">Let's GO</h3>
