@@ -3,13 +3,15 @@
     {{range .flashes}}
     <div class="alert alert-info">{{.}}</div>
     {{end}}
-    <div class="container-md category rounded ">
-        <div class="container-sm category-title my-2">
-            <h1>{{.forum.Name}}</h1>
-        </div>
+    <!-- Main container -->
+    <div class="container-md solo-forum rounded ">
         <div class="container-sm forum-head my-2">
-            <div class="forum-description forum-column">
-                <p>{{.forum.Description}}</p>
+            <div class="container-sm forum-title my-2 center">
+                <h2>{{.forum.Name}}</h2>
+            </div>
+            <div class="forum-description container col-10">
+            <small>Description:</small>
+                <p class="lead">{{.forum.Description}}</p>
             </div>
             {{ if eq .forum.User.Email .user }}
                 <div>
