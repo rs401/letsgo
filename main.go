@@ -17,6 +17,7 @@ var forumHandler *handlers.ForumHandler
 var threadHandler *handlers.ThreadHandler
 var postHandler *handlers.PostHandler
 var memberHandler *handlers.MemberHandler
+var userHandler *handlers.UserHandler
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -28,6 +29,7 @@ func init() {
 	threadHandler = &handlers.ThreadHandler{}
 	postHandler = &handlers.PostHandler{}
 	memberHandler = &handlers.MemberHandler{}
+	userHandler = &handlers.UserHandler{}
 
 }
 
@@ -43,7 +45,7 @@ func SetupServer() *gin.Engine {
 	r := gin.Default()
 
 	store, _ := redisStore.NewStore(10, "tcp", Config("REDIS_HOST")+":"+Config("REDIS_PORT"), "", []byte(Config("SECRET")))
-	store.Options(sessions.Options{MaxAge: 3600})
+	store.Options(sessions.Options{MaxAge: 3600 * 24})
 	r.Use(sessions.Sessions("letsgo_api", store))
 
 	r.Static("/static", "./static")
@@ -84,6 +86,9 @@ func SetupServer() *gin.Engine {
 		authorized.POST("/add_member/:id", memberHandler.AddMemberHandler)
 		authorized.POST("/reject_member/:id", memberHandler.RejectMemberHandler)
 		authorized.POST("/remove_member/:id", memberHandler.RemoveMemberHandler)
+
+		authorized.GET("/account", userHandler.GetUserHandler)
+		authorized.POST("/account", userHandler.UpdateUserHandler)
 
 	}
 
