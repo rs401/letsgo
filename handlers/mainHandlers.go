@@ -31,6 +31,14 @@ func (handler *MainHandler) IndexHandler(c *gin.Context) {
 	})
 }
 
+func (handler *MainHandler) PrivacyHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "privacy.html", gin.H{})
+}
+
+func (handler *MainHandler) TermsHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "terms.html", gin.H{})
+}
+
 func (handler *MainHandler) ErrorHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.AddFlash(c.Errors.Errors())
