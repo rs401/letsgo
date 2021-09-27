@@ -61,6 +61,8 @@ func SetupServer() *gin.Engine {
 	r.GET("/auth-callback", authHandler.CallbackHandler)
 	r.POST("/refresh", authHandler.RefreshHandler)
 	r.GET("/signout", authHandler.SignOutHandler)
+	r.GET("/privacy", mainHandler.PrivacyHandler)
+	r.GET("/terms", mainHandler.TermsHandler)
 	authorized := r.Group("/")
 	authorized.Use(authHandler.AuthMiddleware())
 	{
