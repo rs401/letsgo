@@ -6,9 +6,7 @@
         </div>
         <div class="col">
             <form method="POST" action="/register">
-            {{range .flashes}}
-            <div class="alert alert-info">{{.}}</div>
-            {{end}}
+            {{range .flashes}}<div class="alert alert-info">{{.}}</div>{{end}}
                 <div class="mb-3">
                     <label for="DisplayName" class="form-label">Display Name</label>
                     <input type="text" class="form-control" id="DisplayName" name="DisplayName" aria-describedby="DisplayName">
@@ -31,5 +29,4 @@
         </div>
         <a href="/login">Have an account? Click here to login</a>
     </div>
-
 {{template "foot.html" . }}

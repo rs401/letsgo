@@ -1,28 +1,19 @@
 {{template "head.html" . }}
-
     <h1>{{ .thread.Title }}</h1> 
-    {{range .flashes}}
-    <div class="alert alert-info">{{.}}</div>
-    {{end}}
+    {{range .flashes}}<div class="alert alert-info">{{.}}</div>{{end}}
     <div class="container-md category rounded ">
         <div class="container-sm category-title my-2 border-bottom border-2">
             <div class="op">
                 Op: {{ .thread.User.DisplayName}}<br/>
                 {{ if eq .thread.User.Email .user}}
-                <div>
-                    <a href="/update_thread/{{.thread.ID}}">Edit Event</a> | <a href="/del_thread/{{.thread.ID}}">Delete Event</a>
-                </div>
+                <div><a href="/update_thread/{{.thread.ID}}">Edit Event</a> | <a href="/del_thread/{{.thread.ID}}">Delete Event</a></div>
                 {{end}}
-                <div>
-                    <sub class="small">Event Date:<br/>{{ .date }}</sub>
-                </div>
+                <div><sub class="small">Event Date:<br/>{{ .date }}</sub></div>
             </div>
             <div class="badge">Event Description</div>
             <div class="ms-5">{{.thread.Body}}</div>
         </div>
-        <div>
-            <a href="/new_post/{{.thread.ID}}">+ Post</a>
-        </div>
+        <div><a href="/new_post/{{.thread.ID}}">+ Post</a></div>
         <div class="container-sm thread-rows">
             {{range .posts}}
                 <div class="thread-row">
@@ -34,10 +25,8 @@
                         </small>
                     </div>
                     <div class="thread-column">{{.Body}}</div>
-                
                 </div>
             {{end}}
         </div>
     </div>
-
 {{template "foot.html" .}}
