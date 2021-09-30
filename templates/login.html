@@ -1,14 +1,10 @@
 {{template "head.html" . }}
     <div class="login mx-auto">
         <h1>Login</h1>
-        <div class="mb-5">
-            <a href="{{.gurl}}"><img src="/static/img/btn_google_signin_dark_normal_web.png" alt="Sign In with Google"></a>
-        </div>
+        <div class="mb-5"><a href="{{.gurl}}"><img src="/static/img/btn_google_signin_dark_normal_web.png" alt="Sign In with Google"></a></div>
         <div class="col">
             <form method="POST" action="/login">
-            {{range .flashes}}
-            <div class="alert alert-info">{{.}}</div>
-            {{end}}
+            {{range .flashes}}<div class="alert alert-info">{{.}}</div>{{end}}
                 <div class="mb-3">
                     <label for="Email" class="form-label">Email address</label>
                     <input type="email" class="form-control" id="Email" name="Email" aria-describedby="emailHelp">
@@ -23,5 +19,4 @@
         </div>
         <a href="/register">Click here to Register an account</a>
     </div>
-
 {{template "foot.html" . }}
