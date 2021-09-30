@@ -1,5 +1,4 @@
 {{template "head.html" . }}
-
     {{range .flashes}}
     <div class="alert alert-info">{{.}}</div>
     {{end}}
@@ -30,10 +29,7 @@
                     <button type="submit" class="btn btn-primary">Request to Join Group</button>
                 </form>
             {{else}}
-                <div>
-                    <a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a>
-                </div>
-
+                <div><a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a></div>
                 {{if .threads}}
                     {{range .threads}}
                         <div class="forum-row">
@@ -51,10 +47,7 @@
                 {{end}}
             {{end}}
         {{else}}
-            <div>
-                <a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a>
-            </div>
-
+            <div><a class="btn btn-primary btn-outline" href="/new_thread/{{.forum.ID}}">+ Event</a></div>
             {{if .threads}}
                 {{range .threads}}
                     <div class="forum-row">
@@ -73,5 +66,4 @@
         {{end}}
         </div>
     </div>
-
 {{template "foot.html" .}}
