@@ -1,15 +1,10 @@
 {{template "head.html" . }}
-
     {{range .flashes}}
     <div class="alert alert-info">{{.}}</div>
     {{end}}
-    <div>
-        <a class="btn btn-primary" href="/new_forum">Create New Group</a>
-    </div>
+    <div><a class="btn btn-primary" href="/new_forum">Create New Group</a></div>
     <div class="container-md category rounded ">
-    <div class="container-sm category-title my-2">
-        <h2>Category name</h2>
-    </div>
+    <div class="container-sm category-title my-2"><h2>Category name</h2></div>
     {{range .forums}}
         <div class="forum-row">
             <div class="forum-icon forum-column center">
@@ -24,5 +19,4 @@
         </div>
     {{end}}
     </div>
-
 {{template "foot.html" .}}
