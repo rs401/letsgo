@@ -1,12 +1,9 @@
 {{template "head.html" . }}
-
     <div class=" mx-auto">
         <h1>Edit</h1>
         <div class="col">
             <form method="POST" action="/update_thread/{{.id}}">
-            {{range .flashes}}
-            <div class="alert alert-info">{{.}}</div>
-            {{end}}
+            {{range .flashes}}<div class="alert alert-info">{{.}}</div>{{end}}
                 <div class="mb-3">
                     <label for="title" class="form-label">Event Title</label>
                     <input type="text" class="form-control" id="title" name="title" aria-describedby="titleHelp" value="{{.thread.Title}}">
@@ -20,5 +17,4 @@
             </form>
         </div>
     </div>
-
 {{template "foot.html" . }}
