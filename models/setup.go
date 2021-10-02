@@ -51,6 +51,6 @@ func InitDatabase() {
 	status := RedisClient.Ping(context.Background())
 	fmt.Println("====REDIS PING: ", status.Val())
 
-	DBConn.AutoMigrate(&Forum{}, &Thread{}, &Post{}, &User{}, &Member{}, &PendingMember{}) //, &Recipe{}, &Tag{}, &Ingredient{}, &Instruction{})
+	DBConn.AutoMigrate(&Forum{}, &Thread{}, &Post{}, &User{}, &Member{}, &PendingMember{}, &Image{})
 	fmt.Println("Database migrated.")
 }

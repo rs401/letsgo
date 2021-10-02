@@ -1,0 +1,16 @@
+{{template "head.html" . }}
+<div class=" mx-auto">
+    <h1>Account</h1>
+    <div class="col">
+        <form method="POST" action="/account_image" enctype="multipart/form-data">
+        {{range .flashes}}<div class="alert alert-info">{{.}}</div>{{end}}
+        <div class="mb-3">
+            <label for="file" class="form-label">Choose Profile Image</label>
+            <input type="file" class="form-control" id="file" name="file" accept="image/png, image/jpeg">
+            <input type="hidden" id="csrf" name="csrf" value="{{.csrf}}">
+        </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+</div>
+{{template "foot.html" . }}
