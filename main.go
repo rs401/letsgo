@@ -18,6 +18,7 @@ var threadHandler *handlers.ThreadHandler
 var postHandler *handlers.PostHandler
 var memberHandler *handlers.MemberHandler
 var userHandler *handlers.UserHandler
+var imageHandler *handlers.ImageHandler
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -30,7 +31,7 @@ func init() {
 	postHandler = &handlers.PostHandler{}
 	memberHandler = &handlers.MemberHandler{}
 	userHandler = &handlers.UserHandler{}
-
+	imageHandler = &handlers.ImageHandler{}
 }
 
 func Config(key string) string {
@@ -91,6 +92,8 @@ func SetupServer() *gin.Engine {
 
 		authorized.GET("/account", userHandler.GetUserHandler)
 		authorized.POST("/account", userHandler.UpdateUserHandler)
+		authorized.GET("/account_image", imageHandler.UploadProfileImageHandler)
+		authorized.POST("/account_image", imageHandler.UploadProfileImageHandler)
 
 	}
 

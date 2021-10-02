@@ -195,14 +195,14 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	}
 
 	client := conf.Client(context.Background(), token)
-	email, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	defer email.Body.Close()
-	data, _ := ioutil.ReadAll(email.Body)
-	fmt.Println("==== Email body: ", string(data))
+	defer resp.Body.Close()
+	data, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("==== Response body: ", string(data))
 
 	// read email, name, picture into GUser model
 	var guser models.GUser
@@ -210,10 +210,11 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 		fmt.Println("Couldn't unmarshal data to guser: ", err.Error())
 	}
 	// check if user exists
-	user := getUserByEmail(guser.Email)
+	var user *models.User
+	user = getUserByEmail(guser.Email)
 	if user == nil {
 		// if not exists, create new user
-		user := models.User{
+		user = &models.User{
 			DisplayName: guser.Name,
 			Email:       guser.Email,
 			Picture:     guser.Picture,
@@ -223,7 +224,9 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	}
 	// if exists, set and update displayname and picture
 	user.DisplayName = guser.Name
-	user.Picture = guser.Picture
+	if user.Picture == "" {
+		user.Picture = guser.Picture
+	}
 	models.DBConn.Save(&user)
 	// Set auth session
 	sessionToken := uuid.NewString()
