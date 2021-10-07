@@ -263,7 +263,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/forums/"+strconv.Itoa(int(forum.ID)))
 }
 
-// ConfirmDeleteForumHandler
+// ConfirmDeleteForumHandler returns confirmation form
 func (handler *ForumHandler) ConfirmDeleteForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -277,7 +277,7 @@ func (handler *ForumHandler) ConfirmDeleteForumHandler(c *gin.Context) {
 	session.Save()
 }
 
-// DeleteForumHandler
+// DeleteForumHandler deletes the forum
 func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -357,7 +357,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-// UpdateForumHandler
+// UpdateForumHandler returns update forum form on GET and updates forum on POST
 func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))

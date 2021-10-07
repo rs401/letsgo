@@ -6,6 +6,8 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+[![Build][build-shield]][build-url]
+[![GoReportCard][goreportcard-shield]][goreportcard-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -176,6 +178,10 @@ Project Link: [https://github.com/rs401/letsgo](https://github.com/rs401/letsgo)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[build-shield]: https://img.shields.io/github/workflow/status/rs401/letsgo/Build?style=for-the-badge
+[build-url]: https://github.com/rs401/letsgo/actions/workflows/push.yml
+[goreportcard-shield]: https://goreportcard.com/badge/github.com/rs401/letsgo?style=for-the-badge
+[goreportcard-url]: https://goreportcard.com/report/github.com/rs401/letsgo
 [contributors-shield]: https://img.shields.io/github/contributors/rs401/letsgo.svg?style=for-the-badge
 [contributors-url]: https://github.com/rs401/letsgo/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/rs401/letsgo.svg?style=for-the-badge
@@ -185,7 +191,7 @@ Project Link: [https://github.com/rs401/letsgo](https://github.com/rs401/letsgo)
 [issues-shield]: https://img.shields.io/github/issues/rs401/letsgo.svg?style=for-the-badge
 [issues-url]: https://github.com/rs401/letsgo/issues
 [license-shield]: https://img.shields.io/github/license/rs401/letsgo.svg?style=for-the-badge
-[license-url]: https://github.com/rs401/letsgo/blob/master/LICENSE.txt
+[license-url]: https://github.com/rs401/letsgo/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/richard-stadnick-3b4ab53b/
 

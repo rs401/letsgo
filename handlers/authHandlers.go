@@ -20,9 +20,9 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-var SecretKey = os.Getenv("JWT_SECRET")
+// var secretKey = os.Getenv("JWT_SECRET")
 
-// AuthHandler
+// AuthHandler handler func receiver
 type AuthHandler struct{}
 
 var conf *oauth2.Config
