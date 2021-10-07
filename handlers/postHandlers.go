@@ -15,57 +15,7 @@ import (
 
 type PostHandler struct{}
 
-// Not needed because I don't want to list all posts without their parent forum
-// Get all posts
-// func (handler *PostHandler) GetPosts(c *gin.Context) {
-// 	db := models.DBConn
-// 	var posts []models.Post
-// 	fid, err := strconv.Atoi(c.Param("fid"))
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"error": err.Error(),
-// 		})
-// 		return
-// 	}
-// 	db.Where(&models.Post{ThreadID: uint(fid)}).Find(&posts)
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"posts": posts,
-// 	})
-// 	return
-// }
-
-// Get single post
-// func (handler *PostHandler) GetPostHandler(c *gin.Context) {
-// 	session := sessions.Default(c)
-// 	email := fmt.Sprintf("%v", session.Get("email"))
-
-// 	db := models.DBConn
-// 	id, err := strconv.Atoi(c.Param("id"))
-// 	if err != nil {
-// 		c.HTML(http.StatusBadRequest, "post.html", gin.H{
-// 			"error": "Badrequest",
-// 			"user":  email,
-// 		})
-// 		return
-// 	}
-
-// 	var post models.Post
-// 	db.Preload("Posts").Preload("User").Find(&post, id)
-// 	if post.ID == 0 {
-// 		session.AddFlash("Post does not exist in the database.")
-// 		c.HTML(http.StatusNotFound, "post.html", gin.H{
-// 			"user":    email,
-// 			"flashes": session.Flashes(),
-// 		})
-// 		session.Save()
-// 		return
-// 	}
-// 	c.HTML(http.StatusOK, "post.html", gin.H{
-// 		"user":   email,
-// 		"post": post,
-// 	})
-// }
-
+// NewPostHandler returns the new post form on GET and creates new post on POST
 func (handler *PostHandler) NewPostHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))

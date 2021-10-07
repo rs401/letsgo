@@ -14,6 +14,8 @@ import (
 
 type ImageHandler struct{}
 
+// UploadProfileImageHandler returns upload image template on GET and handles
+// creating and resizing image on POST
 func (handler *ImageHandler) UploadProfileImageHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -58,8 +60,6 @@ func (handler *ImageHandler) UploadProfileImageHandler(c *gin.Context) {
 		return
 	}
 
-	// TODO: Resize and convert to jpg or png before saving and add extension to uuid name
-	// file fileheader can open() so use to resize
 	uploadErr := c.SaveUploadedFile(file, filePath)
 	if uploadErr != nil {
 		c.String(http.StatusBadRequest, fmt.Sprintf("'%s' NOT uploaded!\n%v", file.Filename, uploadErr))
@@ -83,11 +83,6 @@ func (handler *ImageHandler) UploadProfileImageHandler(c *gin.Context) {
 	db.Create(&image)
 	user.Picture = image.FileName
 	db.Save(&user)
-	// uploadErr := c.SaveUploadedFile(file, filePath)
-	// if uploadErr != nil {
-	// 	c.String(http.StatusBadRequest, fmt.Sprintf("'%s' NOT uploaded!\n%v", file.Filename, uploadErr))
-	// 	return
-	// }
 
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }

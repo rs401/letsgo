@@ -11,6 +11,7 @@ import (
 
 type MainHandler struct{}
 
+// IndexHandler returns index template
 func (handler *MainHandler) IndexHandler(c *gin.Context) {
 	db := models.DBConn
 	var forums []models.Forum
@@ -31,14 +32,17 @@ func (handler *MainHandler) IndexHandler(c *gin.Context) {
 	})
 }
 
+// PrivacyHandler returns privacy page
 func (handler *MainHandler) PrivacyHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "privacy.html", gin.H{})
 }
 
+// TermsHandler returns terms of use page
 func (handler *MainHandler) TermsHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "terms.html", gin.H{})
 }
 
+// ErrorHandler handles errors
 func (handler *MainHandler) ErrorHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.AddFlash(c.Errors.Errors())
