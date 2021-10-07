@@ -11,6 +11,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// MemberHandler handler func receiver
 type MemberHandler struct{}
 
 // RequestMembershipHandler inserts a pending membership request record.

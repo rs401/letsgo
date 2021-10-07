@@ -12,6 +12,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// UserHandler handler func receiver
 type UserHandler struct{}
 
 // GetUserHandler returns an update user form for account management

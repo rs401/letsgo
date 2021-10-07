@@ -9,6 +9,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// MainHandler handler func receiver
 type MainHandler struct{}
 
 // IndexHandler returns index template

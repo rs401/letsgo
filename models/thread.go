@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Thread model for thread
 type Thread struct {
 	gorm.Model
 	Title   string    `json:"title" gorm:"not null"`
@@ -18,12 +19,14 @@ type Thread struct {
 	Posts   []Post `json:""`
 }
 
+// NewThread form model for new thread
 type NewThread struct {
 	Title string `json:"title" form:"title"`
 	Body  string `json:"body" form:"body"`
 	Csrf  string `json:"csrf" form:"csrf"`
 }
 
+// UpdateThread form model for update thread
 type UpdateThread struct {
 	Title string    `json:"title" form:"title"`
 	Body  string    `json:"body" form:"body"`
