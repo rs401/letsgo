@@ -14,6 +14,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// ThreadHandler handler func receiver
 type ThreadHandler struct{}
 
 // GetThreadHandler returns a thread with it's posts

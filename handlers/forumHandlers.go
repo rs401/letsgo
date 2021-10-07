@@ -15,6 +15,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// ForumHandler handler func receiver
 type ForumHandler struct{}
 
 // GetForumsHandler returns all forums

@@ -13,6 +13,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// PostHandler handler func receiver
 type PostHandler struct{}
 
 // NewPostHandler returns the new post form on GET and creates new post on POST

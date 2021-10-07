@@ -25,13 +25,6 @@ var SecretKey = os.Getenv("JWT_SECRET")
 // AuthHandler
 type AuthHandler struct{}
 
-// GUser model for Google Sign-in user information
-type GUser struct {
-	Name    string `json:"name"`
-	Picture string `json:"picture"`
-	Email   string `json:"email"`
-}
-
 var conf *oauth2.Config
 
 func init() {
