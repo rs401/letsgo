@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	// DBConn database access
 	DBConn      *gorm.DB
 	RedisClient redis.Client
 )
