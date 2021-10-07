@@ -13,7 +13,8 @@ import (
 
 var (
 	// DBConn database access
-	DBConn      *gorm.DB
+	DBConn *gorm.DB
+	// RedisClient redis cache access
 	RedisClient redis.Client
 )
 
