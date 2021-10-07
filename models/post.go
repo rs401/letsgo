@@ -2,6 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
+// Post model for post reply in a thread
 type Post struct {
 	gorm.Model
 	Body     string `json:"body" gorm:"not null"`
@@ -12,6 +13,7 @@ type Post struct {
 	// Thread Thread //`json:"thread"`
 }
 
+// NewPost model for new post form
 type NewPost struct {
 	Body string `json:"body" form:"body"`
 	Csrf string `json:"csrf" form:"csrf"`

@@ -12,6 +12,7 @@ import (
 	"github.com/rs401/letsgo/models"
 )
 
+// ImageHandler handler func receiver
 type ImageHandler struct{}
 
 // UploadProfileImageHandler returns upload image template on GET and handles
