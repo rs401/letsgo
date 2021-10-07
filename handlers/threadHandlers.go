@@ -16,26 +16,7 @@ import (
 
 type ThreadHandler struct{}
 
-// Not needed because I don't want to list all threads without their parent forum
-// Get all threads
-// func (handler *ThreadHandler) GetThreads(c *gin.Context) {
-// 	db := models.DBConn
-// 	var threads []models.Thread
-// 	fid, err := strconv.Atoi(c.Param("fid"))
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"error": err.Error(),
-// 		})
-// 		return
-// 	}
-// 	db.Where(&models.Thread{ForumID: uint(fid)}).Find(&threads)
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"threads": threads,
-// 	})
-// 	return
-// }
-
-// Get single thread
+// GetThreadHandler returns a thread with it's posts
 func (handler *ThreadHandler) GetThreadHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -69,6 +50,7 @@ func (handler *ThreadHandler) GetThreadHandler(c *gin.Context) {
 	})
 }
 
+// NewThreadHandler handles returns form on GET and creates thread on POST
 func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -152,6 +134,7 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 // 	return c.SendString("Thread successfully Deleted from database.")
 // }
 
+// UpdateThreadHandler return form on GET and updates thread on POST
 func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -187,23 +170,6 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 		return
 	}
 
-	// Check forum exists
-	// fid := oldThread.ForumID
-	// var forum models.Forum
-	// db.Find(&forum, fid)
-	// if forum.ID == 0 {
-	// 	session.AddFlash("Invalid input")
-	// 	c.HTML(http.StatusTeapot, "update_thread.html", gin.H{
-	// 		"user":    email,
-	// 		"id":      id,
-	// 		"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
-	// 		"flashes": session.Flashes(),
-	// 	})
-	// 	session.Save()
-	// 	log.Printf("Invalid Forum ID. user: %f", email)
-	// 	return
-	// }
-
 	// Get updated thread
 	title := c.PostForm("title")
 	body := c.PostForm("body")
@@ -221,18 +187,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 		session.Save()
 		return
 	}
-	// if err := c.Bind(updThread); err != nil {
-	// 	session.AddFlash("Invalid input")
-	// 	session.AddFlash("could not bind data")
-	// 	c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
-	// 		"user":    email,
-	// 		"id":      id,
-	// 		"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
-	// 		"flashes": session.Flashes(),
-	// 	})
-	// 	session.Save()
-	// 	return
-	// }
+
 	const shortform = "2006-01-02"
 	parsedDate, err := time.Parse(shortform, date)
 	if err != nil {

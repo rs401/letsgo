@@ -17,8 +17,7 @@ import (
 
 type ForumHandler struct{}
 
-// Forums
-// Get all forums
+// GetForumsHandler returns all forums
 func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -68,7 +67,7 @@ func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 	}
 }
 
-// Get single forum
+// GetForumHandler returns a single forum
 func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -173,6 +172,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	}
 }
 
+// IsMember checks if user is a member of the private forum
 func IsMember(fid, uid uint) bool {
 	var members []models.Member
 	db := models.DBConn
@@ -185,6 +185,8 @@ func IsMember(fid, uid uint) bool {
 	return false
 }
 
+// NewForumHandler handles returning new forum template on GET and creates new
+// forum on POST
 func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -260,6 +262,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/forums/"+strconv.Itoa(int(forum.ID)))
 }
 
+// ConfirmDeleteForumHandler
 func (handler *ForumHandler) ConfirmDeleteForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -273,6 +276,7 @@ func (handler *ForumHandler) ConfirmDeleteForumHandler(c *gin.Context) {
 	session.Save()
 }
 
+// DeleteForumHandler
 func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
@@ -352,6 +356,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
+// UpdateForumHandler
 func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
