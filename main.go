@@ -34,10 +34,12 @@ func init() {
 	imageHandler = &handlers.ImageHandler{}
 }
 
+// Config retrieves env vars
 func Config(key string) string {
 	return os.Getenv(key)
 }
 
+// SetupServer creates Gin engine
 func SetupServer() *gin.Engine {
 	if Config("GIN_MODE") == "release" {
 		gin.SetMode(gin.ReleaseMode)

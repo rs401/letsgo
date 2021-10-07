@@ -69,7 +69,7 @@ func (handler *MemberHandler) ManageMembersHandler(c *gin.Context) {
 	})
 }
 
-// AddMemberHandler
+// AddMemberHandler adds a user to the member list of the forum
 func (handler *MemberHandler) AddMemberHandler(c *gin.Context) {
 	db := models.DBConn
 	session := sessions.Default(c)
@@ -113,7 +113,7 @@ func (handler *MemberHandler) AddMemberHandler(c *gin.Context) {
 	session.Save()
 }
 
-// RejectMemberHandler
+// RejectMemberHandler removes the pending request
 func (handler *MemberHandler) RejectMemberHandler(c *gin.Context) {
 	db := models.DBConn
 	session := sessions.Default(c)
@@ -154,7 +154,7 @@ func (handler *MemberHandler) RejectMemberHandler(c *gin.Context) {
 	session.Save()
 }
 
-// RemoveMemberHandler
+// RemoveMemberHandler removes a member from the member list
 func (handler *MemberHandler) RemoveMemberHandler(c *gin.Context) {
 	db := models.DBConn
 	session := sessions.Default(c)
