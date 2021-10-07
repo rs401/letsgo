@@ -22,8 +22,10 @@ import (
 
 var SecretKey = os.Getenv("JWT_SECRET")
 
+// AuthHandler
 type AuthHandler struct{}
 
+// GUser model for Google Sign-in user information
 type GUser struct {
 	Name    string `json:"name"`
 	Picture string `json:"picture"`
@@ -58,6 +60,7 @@ func getUserByEmail(e string) *models.User {
 	return nil
 }
 
+// AuthMiddleware Checks session for protected endpoints
 func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
@@ -71,6 +74,7 @@ func (handler *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
+// RefreshHandler refreshes session
 func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	sessionToken := session.Get("token")
@@ -88,6 +92,8 @@ func (handler *AuthHandler) RefreshHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "New session issued"})
 }
 
+// LoginHandler handles returning Login template for GET requests and handles
+// login for POST requests
 func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	var state, email string
@@ -180,6 +186,7 @@ func getLoginURL(state string) string {
 	return conf.AuthCodeURL(state)
 }
 
+// CallbackHandler handles the exchange from Google Sign-in
 func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	callbackState := session.Get("state")
@@ -239,6 +246,8 @@ func (handler *AuthHandler) CallbackHandler(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
+// RegisterHandler handles returning register template for GET and registers
+// users on POST
 func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 	var state string
 	session := sessions.Default(c)
@@ -337,6 +346,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/login")
 }
 
+// SignOutHandler removes user session
 func (handler *AuthHandler) SignOutHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Delete("user")

@@ -22,17 +22,18 @@ func init() {
 	}
 }
 
+// Config retrieves env vars
 func Config(key string) string {
 	return os.Getenv(key)
 }
 
+// InitDatabase configures database connection from environment variables
 func InitDatabase() {
 	var err error
 	dbpass := Config("POSTGRES_PASSWORD")
 	dbuser := Config("POSTGRES_USER")
 	dbport := Config("POSTGRES_PORT")
 	dbhost := Config("POSTGRES_HOST")
-	// dbhost := "localhost"
 	dbname := Config("POSTGRES_DB")
 
 	dsn := fmt.Sprintf("host=" + dbhost + " user=" + dbuser + " password=" + dbpass + " dbname=" + dbname + " port=" + dbport)
