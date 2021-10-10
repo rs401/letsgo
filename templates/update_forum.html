@@ -9,6 +9,8 @@
                 <input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" value="{{.forum.Name}}" required>
                 <label for="description" class="form-label">Group Description</label>
                 <textarea class="form-control" id="description" name="description" aria-describedby="descriptionHelp" required>{{.forum.Description}}</textarea>
+                <label for="tags" class="form-label">Tags - Comma separated tags</label>
+                <input type="text" class="form-control" id="tags" name="tags" aria-describedby="tagsHelp" value="{{.tags}}">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="open" name="open" {{if .forum.Open}}checked{{end}}>
                     <label class="form-check-label" for="open">Membership Open to All Users: {{.forum.Open}}</label>

@@ -109,6 +109,10 @@ i{
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.4) !important;
 }
 
+.forum-foot {
+    background-color: #4b38323f;
+}
+
 .forum-title{
     padding: 5px;
     border-radius: 5px;
