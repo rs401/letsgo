@@ -19,6 +19,12 @@
                     | <a href="/del_forum/{{.forum.ID}}">Delete Group</a>
                 </div>
             {{end}}
+            <div class="forum-foot">
+                TAGS: 
+                {{range .forum.Tags}}
+                <small>{{.Name}}, </small>
+                {{end}}
+            </div>
         </div>
         <div class="container-sm">
         {{if not .forum.Open}}
