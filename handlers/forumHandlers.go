@@ -85,7 +85,11 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	db := models.DBConn
 	var forum models.Forum
 	user := getUserByEmail(email)
-	db.Preload("User").Find(&forum, id)
+	db.Preload("User").Preload("Tags").Find(&forum, id)
+	var tags string
+	for _, v := range forum.Tags {
+		tags += v.Name + ", "
+	}
 
 	// Check if forum is Open
 	if !forum.Open {
@@ -99,6 +103,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 				"flashes": session.Flashes(),
 				"user":    email,
 				"forum":   forum,
+				"tags":    tags,
 				"id":      id,
 				"uid":     user.ID,
 				"member":  false,
@@ -142,6 +147,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		redisClient.Set(c, fmt.Sprintf("forum%v", c.Param("id")), string(data), 0)
 		c.HTML(http.StatusOK, "forum.html", gin.H{
 			"forum":      forum,
+			"tags":       tags,
 			"forum.User": forum.User,
 			"threads":    forum.Threads,
 			"user":       email,
@@ -384,7 +390,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	// Get original and apply updates
 	var forum models.Forum
 	var updForum = new(models.UpdateForum)
-	res := db.Preload("User").Find(&forum, id)
+	res := db.Preload("User").Preload("Tags").Find(&forum, id)
 	if res.Error != nil {
 		session.AddFlash("Group not found")
 		c.HTML(http.StatusNotFound, "update_forum.html", gin.H{
@@ -398,10 +404,15 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		csrf := uuid.NewString()
 		session.Set("csrf", csrf)
+		var tags string
+		for _, v := range forum.Tags {
+			tags += v.Name + ", "
+		}
 		c.HTML(http.StatusOK, "update_forum.html", gin.H{
 			"user":  email,
 			"id":    id,
 			"forum": forum,
+			"tags":  tags,
 			"csrf":  csrf,
 		})
 		session.Save()
@@ -417,6 +428,9 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	} else {
 		updForum.Open = true
 	}
+	// Tags
+	tags := c.Request.FormValue("tags")
+	processedTags := processTags(tags)
 
 	// Check not empty string
 	if updForum.Name == "" || updForum.Description == "" {
@@ -461,10 +475,28 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	forum.Name = updForum.Name
 	forum.Description = updForum.Description
 	forum.Open = updForum.Open
+	forum.Tags = processedTags
 	db.Save(&forum)
 	log.Println("==== Clearing Redis")
 	redisClient := models.RedisClient
 	redisClient.Del(c, fmt.Sprintf("forum%v", c.Param("id")))
 
 	c.Redirect(http.StatusFound, "/forums/"+c.Param("id"))
+}
+
+func processTags(tags string) []models.Tag {
+	var results []models.Tag = make([]models.Tag, 0)
+	db := models.DBConn
+	splitTags := strings.Split(tags, ",")
+	for _, v := range splitTags {
+		var tag models.Tag
+		v = strings.ToLower(strings.TrimSpace(v))
+		db.Where("name = ?", v).First(&tag)
+		if tag.ID == 0 {
+			tag = models.Tag{Name: v}
+			db.Create(&tag)
+		}
+		results = append(results, tag)
+	}
+	return results
 }
