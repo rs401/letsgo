@@ -1,4 +1,4 @@
-{{template "head.html" . }}
+{{template "head.gotmpl" . }}
     <h1>{{ .thread.Title }}</h1> 
     {{range .flashes}}<div class="alert alert-info">{{.}}</div>{{end}}
     <div class="container-md category rounded ">
@@ -29,4 +29,4 @@
             {{end}}
         </div>
     </div>
-{{template "foot.html" .}}
+{{template "foot.gotmpl" .}}

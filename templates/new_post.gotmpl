@@ -1,4 +1,4 @@
-{{template "head.html" . }}
+{{template "head.gotmpl" . }}
     <h1>Reply to Event</h1> 
     <div class="container-md forums border border-2 rounded p-3">
         <form action="/new_post/{{.tid}}" method="post">
@@ -11,4 +11,4 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-{{template "foot.html" .}}
+{{template "foot.gotmpl" .}}

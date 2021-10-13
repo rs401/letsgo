@@ -20,7 +20,7 @@ func (handler *MemberHandler) RequestMembershipHandler(c *gin.Context) {
 	email := fmt.Sprintf("%v", session.Get("email"))
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "thread.gotmpl", gin.H{
 			"error": "Badrequest",
 			"user":  email,
 		})
@@ -50,7 +50,7 @@ func (handler *MemberHandler) ManageMembersHandler(c *gin.Context) {
 	email := fmt.Sprintf("%v", session.Get("email"))
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "forum.html", gin.H{
+		c.HTML(http.StatusBadRequest, "forum.gotmpl", gin.H{
 			"error": "Badrequest",
 			"user":  email,
 		})
@@ -62,7 +62,7 @@ func (handler *MemberHandler) ManageMembersHandler(c *gin.Context) {
 	var pendingMembers []models.PendingMember
 	db.Where("forum_id = ?", id).Preload("User").Find(&members)
 	db.Where("forum_id = ?", id).Preload("User").Find(&pendingMembers)
-	c.HTML(http.StatusOK, "manage_members.html", gin.H{
+	c.HTML(http.StatusOK, "manage_members.gotmpl", gin.H{
 		"fid":             id,
 		"user":            email,
 		"members":         members,

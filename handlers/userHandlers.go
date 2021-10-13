@@ -23,7 +23,7 @@ func (handler *UserHandler) GetUserHandler(c *gin.Context) {
 	// CSRF
 	csrf := uuid.NewString()
 	session.Set("csrf", csrf)
-	c.HTML(http.StatusOK, "account.html", gin.H{
+	c.HTML(http.StatusOK, "account.gotmpl", gin.H{
 		"csrf":    csrf,
 		"user":    user.Email,
 		"account": user,
@@ -43,7 +43,7 @@ func (handler *UserHandler) UpdateUserHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusOK, "account.html", gin.H{
+		c.HTML(http.StatusOK, "account.gotmpl", gin.H{
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 			"user":    fmt.Sprintf("%v", session.Get("email")),
@@ -55,7 +55,7 @@ func (handler *UserHandler) UpdateUserHandler(c *gin.Context) {
 	// Update user
 	if strings.TrimSpace(c.Request.FormValue("DisplayName")) == "" {
 		session.AddFlash("Display Name cannot be empty.")
-		c.HTML(http.StatusOK, "account.html", gin.H{
+		c.HTML(http.StatusOK, "account.gotmpl", gin.H{
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 			"user":    fmt.Sprintf("%v", session.Get("email")),

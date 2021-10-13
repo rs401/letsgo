@@ -1,4 +1,4 @@
-{{template "head.html" . }}
+{{template "head.gotmpl" . }}
     <div class="px-4 py-5 my-5 text-center">
         <h1 class="display-5 fw-bold">Let's Go</h1><i class="fa fa-search fa-4x" aria-hidden="true"></i>
         <div class="col-lg-6 mx-auto">
@@ -7,4 +7,4 @@
         </div>
     </div>
     <div class="forums">{{range .forums}}<div class="forum">{{.Name}}</div>{{end}}</div>
-{{template "foot.html" .}}
+{{template "foot.gotmpl" .}}

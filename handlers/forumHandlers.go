@@ -32,7 +32,7 @@ func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 		if result.Error != nil {
 			session.AddFlash("Internal Error")
 			log.Printf("==== Error Querying db")
-			c.HTML(http.StatusInternalServerError, "forums.html", gin.H{
+			c.HTML(http.StatusInternalServerError, "forums.gotmpl", gin.H{
 				"error":   "Internal Error",
 				"flashes": session.Flashes(),
 				"user":    email,
@@ -42,14 +42,14 @@ func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 		}
 		data, _ := json.Marshal(forums)
 		redisClient.Set(c, "forums", string(data), 0)
-		c.HTML(http.StatusOK, "forums.html", gin.H{
+		c.HTML(http.StatusOK, "forums.gotmpl", gin.H{
 			"forums": forums,
 			"user":   email,
 		})
 		return
 	} else if err != nil {
 		session.AddFlash("Internal Error")
-		c.HTML(http.StatusInternalServerError, "forums.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "forums.gotmpl", gin.H{
 			"error":   "Internal Error",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -60,7 +60,7 @@ func (handler *ForumHandler) GetForumsHandler(c *gin.Context) {
 		log.Printf("==== Request to Redis")
 		forums = make([]models.Forum, 0)
 		json.Unmarshal([]byte(val), &forums)
-		c.HTML(http.StatusOK, "forums.html", gin.H{
+		c.HTML(http.StatusOK, "forums.gotmpl", gin.H{
 			"forums": forums,
 			"user":   email,
 		})
@@ -75,7 +75,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "forum.html", gin.H{
+		c.HTML(http.StatusBadRequest, "forum.gotmpl", gin.H{
 			"error": "Badrequest",
 			"user":  email,
 		})
@@ -98,7 +98,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 			// If not member show a "Join group" form where the threads would be.
 			session.AddFlash("Not a member")
 			log.Printf("==== Not a member of group")
-			c.HTML(http.StatusOK, "forum.html", gin.H{
+			c.HTML(http.StatusOK, "forum.gotmpl", gin.H{
 				"error":   "Internal Error",
 				"flashes": session.Flashes(),
 				"user":    email,
@@ -125,7 +125,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		if result.Error != nil {
 			session.AddFlash("Internal Error")
 			log.Printf("==== Error Querying db")
-			c.HTML(http.StatusInternalServerError, "forum.html", gin.H{
+			c.HTML(http.StatusInternalServerError, "forum.gotmpl", gin.H{
 				"error":   "Internal Error",
 				"flashes": session.Flashes(),
 				"user":    email,
@@ -135,7 +135,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		}
 		if forum.ID == 0 {
 			session.AddFlash("Not found.")
-			c.HTML(http.StatusNotFound, "forum.html", gin.H{
+			c.HTML(http.StatusNotFound, "forum.gotmpl", gin.H{
 				"message": "notfound",
 				"user":    email,
 				"flashes": session.Flashes(),
@@ -145,7 +145,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		}
 		data, _ := json.Marshal(forum)
 		redisClient.Set(c, fmt.Sprintf("forum%v", c.Param("id")), string(data), 0)
-		c.HTML(http.StatusOK, "forum.html", gin.H{
+		c.HTML(http.StatusOK, "forum.gotmpl", gin.H{
 			"forum":      forum,
 			"tags":       tags,
 			"forum.User": forum.User,
@@ -157,7 +157,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 	} else if err != nil {
 		// Else if != nil, internal error
 		session.AddFlash("Internal Error")
-		c.HTML(http.StatusInternalServerError, "forum.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "forum.gotmpl", gin.H{
 			"error":   "Internal Error",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -168,7 +168,7 @@ func (handler *ForumHandler) GetForumHandler(c *gin.Context) {
 		// Else get it from redis
 		log.Printf("==== Request to Redis")
 		json.Unmarshal([]byte(val), &forum)
-		c.HTML(http.StatusOK, "forum.html", gin.H{
+		c.HTML(http.StatusOK, "forum.gotmpl", gin.H{
 			"forum":      forum,
 			"forum.User": forum.User,
 			"threads":    forum.Threads,
@@ -206,7 +206,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		csrf := uuid.NewString()
 		session.Set("csrf", csrf)
-		c.HTML(http.StatusOK, "new_forum.html", gin.H{
+		c.HTML(http.StatusOK, "new_forum.gotmpl", gin.H{
 			"user": email,
 			"csrf": csrf,
 		})
@@ -228,7 +228,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusOK, "new_forum.html", gin.H{
+		c.HTML(http.StatusOK, "new_forum.gotmpl", gin.H{
 			"user":    email,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
@@ -238,7 +238,7 @@ func (handler *ForumHandler) NewForumHandler(c *gin.Context) {
 	}
 	if strings.TrimSpace(newForum.Name) == "" || strings.TrimSpace(newForum.Description) == "" {
 		session.AddFlash("Name and Description must not be empty.")
-		c.HTML(http.StatusOK, "new_forum.html", gin.H{
+		c.HTML(http.StatusOK, "new_forum.gotmpl", gin.H{
 			"user":    email,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
@@ -275,7 +275,7 @@ func (handler *ForumHandler) ConfirmDeleteForumHandler(c *gin.Context) {
 	email := fmt.Sprintf("%v", session.Get("email"))
 	csrf := uuid.NewString()
 	session.Set("csrf", csrf)
-	c.HTML(http.StatusOK, "confirm_delete.html", gin.H{
+	c.HTML(http.StatusOK, "confirm_delete.gotmpl", gin.H{
 		"user": email,
 		"id":   c.Param("id"),
 		"csrf": csrf,
@@ -294,7 +294,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		session.AddFlash("Bad Request")
-		c.HTML(http.StatusBadRequest, "confirm_delete.html", gin.H{
+		c.HTML(http.StatusBadRequest, "confirm_delete.gotmpl", gin.H{
 			"message": "badrequest",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -315,7 +315,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusOK, "confirm_delete.html", gin.H{
+		c.HTML(http.StatusOK, "confirm_delete.gotmpl", gin.H{
 			"user":    email,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
@@ -328,7 +328,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	res := db.Preload("User").Find(&forum, id)
 	if res.Error != nil {
 		session.AddFlash("Forum not found")
-		c.HTML(http.StatusNotFound, "confirm_delete.html", gin.H{
+		c.HTML(http.StatusNotFound, "confirm_delete.gotmpl", gin.H{
 			"message": "notfound",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -338,7 +338,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	}
 	if forum.ID == 0 {
 		session.AddFlash("Forum not found")
-		c.HTML(http.StatusNotFound, "confirm_delete.html", gin.H{
+		c.HTML(http.StatusNotFound, "confirm_delete.gotmpl", gin.H{
 			"message": "notfound",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -348,7 +348,7 @@ func (handler *ForumHandler) DeleteForumHandler(c *gin.Context) {
 	}
 	if forum.User.Email != user.Email {
 		session.AddFlash("Forbidden")
-		c.HTML(http.StatusForbidden, "confirm_delete.html", gin.H{
+		c.HTML(http.StatusForbidden, "confirm_delete.gotmpl", gin.H{
 			"message": "forbidden",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -379,7 +379,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		session.AddFlash("Bad Request")
-		c.HTML(http.StatusBadRequest, "update_forum.html", gin.H{
+		c.HTML(http.StatusBadRequest, "update_forum.gotmpl", gin.H{
 			"message": "badrequest",
 			"user":    email,
 			"flashes": session.Flashes(),
@@ -393,7 +393,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	res := db.Preload("User").Preload("Tags").Find(&forum, id)
 	if res.Error != nil {
 		session.AddFlash("Group not found")
-		c.HTML(http.StatusNotFound, "update_forum.html", gin.H{
+		c.HTML(http.StatusNotFound, "update_forum.gotmpl", gin.H{
 			"message": "notfound",
 			"user":    email,
 			"flashes": session.Flashes(),
@@ -408,7 +408,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		for _, v := range forum.Tags {
 			tags += v.Name + ", "
 		}
-		c.HTML(http.StatusOK, "update_forum.html", gin.H{
+		c.HTML(http.StatusOK, "update_forum.gotmpl", gin.H{
 			"user":  email,
 			"id":    id,
 			"forum": forum,
@@ -436,7 +436,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	if updForum.Name == "" || updForum.Description == "" {
 		session.AddFlash("Bad Request")
 		session.AddFlash("Name and Description must not be empty.")
-		c.HTML(http.StatusBadRequest, "update_forum.html", gin.H{
+		c.HTML(http.StatusBadRequest, "update_forum.gotmpl", gin.H{
 			"message": "badrequest",
 			"user":    email,
 			"id":      id,
@@ -450,7 +450,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 	if forum.User.Email != user.Email {
 		session.AddFlash("Forbidden")
 		log.Printf("Unauthorized update attempt: %s", user.Email)
-		c.HTML(http.StatusForbidden, "update_forum.html", gin.H{
+		c.HTML(http.StatusForbidden, "update_forum.gotmpl", gin.H{
 			"message": "forbidden",
 			"flashes": session.Flashes(),
 			"user":    email,
@@ -463,7 +463,7 @@ func (handler *ForumHandler) UpdateForumHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusOK, "update_forum.html", gin.H{
+		c.HTML(http.StatusOK, "update_forum.gotmpl", gin.H{
 			"user":    email,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),

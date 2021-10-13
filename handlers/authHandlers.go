@@ -98,7 +98,7 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 		session.Set("state", state)
 		session.Set("csrf", csrf)
 		session.Save()
-		c.HTML(http.StatusOK, "login.html", gin.H{
+		c.HTML(http.StatusOK, "login.gotmpl", gin.H{
 			"gurl": url,
 			"user": email,
 			"csrf": csrf,
@@ -111,7 +111,7 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 		session.AddFlash("Invalid Input")
 		state = fmt.Sprintf("%v", session.Get("state"))
 		url := getLoginURL(state)
-		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+		c.HTML(http.StatusBadRequest, "login.gotmpl", gin.H{
 			"error":   "Invalid input",
 			"flashes": session.Flashes(),
 			"gurl":    url,
@@ -126,7 +126,7 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 	if user == nil {
 		session.AddFlash("Email/Password Incorrect")
 		url := getLoginURL(state)
-		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+		c.HTML(http.StatusBadRequest, "login.gotmpl", gin.H{
 			"message": "email/password incorrect",
 			"flashes": session.Flashes(),
 			"gurl":    url,
@@ -142,7 +142,7 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusOK, "login.html", gin.H{
+		c.HTML(http.StatusOK, "login.gotmpl", gin.H{
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
@@ -152,7 +152,7 @@ func (handler *AuthHandler) LoginHandler(c *gin.Context) {
 
 	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(loginUser.Pass1)); err != nil {
 		session.AddFlash("Email/Password Incorrect")
-		c.HTML(http.StatusBadRequest, "login.html", gin.H{
+		c.HTML(http.StatusBadRequest, "login.gotmpl", gin.H{
 			"message": "email/password incorrect",
 			"flashes": session.Flashes(),
 		})
@@ -251,7 +251,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 		session.Set("state", state)
 		session.Set("csrf", csrf)
 		session.Save()
-		c.HTML(http.StatusOK, "register.html", gin.H{
+		c.HTML(http.StatusOK, "register.gotmpl", gin.H{
 			"message": "register",
 			"gurl":    url,
 			"csrf":    csrf,
@@ -262,7 +262,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 	if err := c.Bind(&newUser); err != nil {
 		session.AddFlash("invalid input")
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		c.HTML(http.StatusBadRequest, "register.gotmpl", gin.H{
 			"error":   "invalid input",
 			"flashes": session.Flashes(),
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -273,7 +273,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 
 	if err := getUserByEmail(newUser.Email); err != nil {
 		session.AddFlash("email already exists in database")
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		c.HTML(http.StatusBadRequest, "register.gotmpl", gin.H{
 			"error":   "email already exists in database",
 			"flashes": session.Flashes(),
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -284,7 +284,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 	// Check passwords match
 	if newUser.Pass1 == "" || newUser.Pass1 != newUser.Pass2 {
 		session.AddFlash("Passwords do not match.")
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		c.HTML(http.StatusBadRequest, "register.gotmpl", gin.H{
 			"error":   "Passwords do not match.",
 			"flashes": session.Flashes(),
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -295,7 +295,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 	// Check DisplayName not empty
 	if newUser.DisplayName == "" {
 		session.AddFlash("Display Name cannot be empty.")
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		c.HTML(http.StatusBadRequest, "register.gotmpl", gin.H{
 			"error":   "displayname empty",
 			"flashes": session.Flashes(),
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -309,7 +309,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusOK, "register.html", gin.H{
+		c.HTML(http.StatusOK, "register.gotmpl", gin.H{
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
 			"flashes": session.Flashes(),
 		})
@@ -321,7 +321,7 @@ func (handler *AuthHandler) RegisterHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println("=========== Houston, we have a problem")
 		session.AddFlash("Passwords do not match.")
-		c.HTML(http.StatusInternalServerError, "register.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "register.gotmpl", gin.H{
 			"error":   "internal server error",
 			"flashes": session.Flashes(),
 		})
