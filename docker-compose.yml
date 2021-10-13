@@ -31,6 +31,7 @@ services:
       - ./scripts/db:/docker-entrypoint-initdb.d/
   letsgo_app:
     container_name: letsgo_app
+    image: letsgo:latest
     build:
       context: .
       dockerfile: Dockerfile
