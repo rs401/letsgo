@@ -20,14 +20,14 @@ func (handler *MainHandler) IndexHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("email"))
 	if session.Get("email") == nil {
-		c.HTML(http.StatusOK, "index.html", gin.H{
+		c.HTML(http.StatusOK, "index.gotmpl", gin.H{
 			"forums": forums,
 			"user":   email,
 		})
 		return
 	}
 	user := getUserByEmail(session.Get("email").(string))
-	c.HTML(http.StatusOK, "index.html", gin.H{
+	c.HTML(http.StatusOK, "index.gotmpl", gin.H{
 		"forums": forums,
 		"user":   user.Email,
 	})
@@ -35,19 +35,19 @@ func (handler *MainHandler) IndexHandler(c *gin.Context) {
 
 // PrivacyHandler returns privacy page
 func (handler *MainHandler) PrivacyHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "privacy.html", gin.H{})
+	c.HTML(http.StatusOK, "privacy.gotmpl", gin.H{})
 }
 
 // TermsHandler returns terms of use page
 func (handler *MainHandler) TermsHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "terms.html", gin.H{})
+	c.HTML(http.StatusOK, "terms.gotmpl", gin.H{})
 }
 
 // ErrorHandler handles errors
 func (handler *MainHandler) ErrorHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.AddFlash(c.Errors.Errors())
-	c.HTML(http.StatusOK, "error.html", gin.H{
+	c.HTML(http.StatusOK, "error.gotmpl", gin.H{
 		"flashes": c.Errors.Errors(),
 	})
 	session.Save()

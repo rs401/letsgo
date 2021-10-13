@@ -25,7 +25,7 @@ func (handler *ThreadHandler) GetThreadHandler(c *gin.Context) {
 	db := models.DBConn
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "thread.gotmpl", gin.H{
 			"error": "Badrequest",
 			"user":  email,
 		})
@@ -36,14 +36,14 @@ func (handler *ThreadHandler) GetThreadHandler(c *gin.Context) {
 	db.Preload("Posts").Preload("Posts.User").Preload("User").Find(&thread, id)
 	if thread.ID == 0 {
 		session.AddFlash("Thread does not exist in the database.")
-		c.HTML(http.StatusNotFound, "thread.html", gin.H{
+		c.HTML(http.StatusNotFound, "thread.gotmpl", gin.H{
 			"user":    email,
 			"flashes": session.Flashes(),
 		})
 		session.Save()
 		return
 	}
-	c.HTML(http.StatusOK, "thread.html", gin.H{
+	c.HTML(http.StatusOK, "thread.gotmpl", gin.H{
 		"user":   email,
 		"thread": thread,
 		"date":   thread.Date.Format("2006, Jan 02"),
@@ -59,7 +59,7 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		csrf := uuid.NewString()
 		session.Set("csrf", csrf)
-		c.HTML(http.StatusOK, "new_thread.html", gin.H{
+		c.HTML(http.StatusOK, "new_thread.gotmpl", gin.H{
 			"user": email,
 			"fid":  fid,
 			"csrf": csrf,
@@ -72,7 +72,7 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	newThread := new(models.NewThread)
 	if err := c.Bind(&newThread); err != nil {
 		session.AddFlash("Bad Request")
-		c.HTML(http.StatusBadRequest, "new_thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "new_thread.gotmpl", gin.H{
 			"user": email,
 			"fid":  fid,
 			"csrf": fmt.Sprintf("%v", session.Get("csrf")),
@@ -84,7 +84,7 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	var forum models.Forum
 	db.Find(&forum, fid)
 	if forum.ID == 0 {
-		c.HTML(http.StatusNotFound, "new_thread.html", gin.H{
+		c.HTML(http.StatusNotFound, "new_thread.gotmpl", gin.H{
 			"user": email,
 			"fid":  fid,
 			"csrf": fmt.Sprintf("%v", session.Get("csrf")),
@@ -95,7 +95,7 @@ func (handler *ThreadHandler) NewThreadHandler(c *gin.Context) {
 	forumId, _ := strconv.Atoi(fid)
 	if strings.TrimSpace(newThread.Title) == "" || strings.TrimSpace(newThread.Body) == "" {
 		session.AddFlash("Title and Body cannot be empty.")
-		c.HTML(http.StatusBadRequest, "new_thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "new_thread.gotmpl", gin.H{
 			"user":    email,
 			"fid":     fid,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -147,7 +147,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 	db.Preload("User").Find(&oldThread, id)
 	if oldThread.ID == 0 {
 		session.AddFlash("Invalid path")
-		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "update_thread.gotmpl", gin.H{
 			"user":    email,
 			"id":      id,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -161,7 +161,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		csrf := uuid.NewString()
 		session.Set("csrf", csrf)
-		c.HTML(http.StatusOK, "update_thread.html", gin.H{
+		c.HTML(http.StatusOK, "update_thread.gotmpl", gin.H{
 			"user":   email,
 			"id":     id,
 			"csrf":   csrf,
@@ -179,7 +179,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 	if strings.TrimSpace(title) == "" || strings.TrimSpace(body) == "" || strings.TrimSpace(date) == "" {
 		session.AddFlash("Invalid input")
 		session.AddFlash("All fields must not be empty.")
-		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "update_thread.gotmpl", gin.H{
 			"user":    email,
 			"id":      id,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -204,7 +204,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 		session.AddFlash("Cross Site Request Forgery")
 		log.Println("==== CSRF did not match")
 		log.Printf("==== %v", session.Get("email"))
-		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "update_thread.gotmpl", gin.H{
 			"user":    email,
 			"id":      id,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -217,7 +217,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 	if strings.TrimSpace(updThread.Title) == "" || strings.TrimSpace(updThread.Body) == "" {
 		session.AddFlash("Invalid input")
 		session.AddFlash("Title and Description cannot be empty.")
-		c.HTML(http.StatusBadRequest, "update_thread.html", gin.H{
+		c.HTML(http.StatusBadRequest, "update_thread.gotmpl", gin.H{
 			"user":    email,
 			"id":      id,
 			"csrf":    fmt.Sprintf("%v", session.Get("csrf")),
@@ -231,7 +231,7 @@ func (handler *ThreadHandler) UpdateThreadHandler(c *gin.Context) {
 	if oldThread.User.Email != user.Email {
 		session.AddFlash("Unauthorized")
 		log.Printf("oldThread.User.Email: %s, user.Email: %s", oldThread.User.Email, user.Email)
-		c.HTML(http.StatusUnauthorized, "update_thread.html", gin.H{
+		c.HTML(http.StatusUnauthorized, "update_thread.gotmpl", gin.H{
 			"user":    email,
 			"id":      id,
 			"flashes": session.Flashes(),

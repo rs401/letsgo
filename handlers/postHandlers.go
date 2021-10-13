@@ -24,7 +24,7 @@ func (handler *PostHandler) NewPostHandler(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		csrf := uuid.NewString()
 		session.Set("csrf", csrf)
-		c.HTML(http.StatusOK, "new_post.html", gin.H{
+		c.HTML(http.StatusOK, "new_post.gotmpl", gin.H{
 			"user": email,
 			"tid":  tid,
 			"csrf": csrf,
@@ -38,7 +38,7 @@ func (handler *PostHandler) NewPostHandler(c *gin.Context) {
 	if err := c.Bind(&newPost); err != nil {
 		session.AddFlash("Bad Request")
 		csrf := uuid.NewString()
-		c.HTML(http.StatusBadRequest, "new_post.html", gin.H{
+		c.HTML(http.StatusBadRequest, "new_post.gotmpl", gin.H{
 			"error":   err.Error(),
 			"user":    email,
 			"tid":     tid,
@@ -54,7 +54,7 @@ func (handler *PostHandler) NewPostHandler(c *gin.Context) {
 	if thread.ID == 0 {
 		session.AddFlash("Thread doesn't exist")
 		csrf := uuid.NewString()
-		c.HTML(http.StatusNotFound, "new_post.html", gin.H{
+		c.HTML(http.StatusNotFound, "new_post.gotmpl", gin.H{
 			"error":   "Thread doesn't exist",
 			"user":    email,
 			"tid":     tid,
@@ -70,7 +70,7 @@ func (handler *PostHandler) NewPostHandler(c *gin.Context) {
 		session.AddFlash("Body cannot be empty.")
 		csrf := uuid.NewString()
 		session.Set("csrf", csrf)
-		c.HTML(http.StatusBadRequest, "new_post.html", gin.H{
+		c.HTML(http.StatusBadRequest, "new_post.gotmpl", gin.H{
 			"user":    email,
 			"tid":     tid,
 			"csrf":    csrf,

@@ -77,7 +77,7 @@
 
 This is a side project I am working on during my last semester of a BS in Software Development.
 
-Let's Go started as a way or families to organize cookouts, birthday parties, family reunions, etc. Then I thought, any group of people might want to gather for &lt;insert reason&gt;. 
+Let's Go started as a way for families to organize cookouts, birthday parties, family reunions, etc. Then I thought, any group of people might want to gather for &lt;insert reason&gt;. 
 
 
 ### Built With
