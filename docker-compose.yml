@@ -46,6 +46,4 @@ services:
       - ${LE_SSL}:/app/le-ssl
     ports:
       - "${API_PORT}:${API_PORT}"
-    env_file:
-      - .env
     entrypoint: ["/bin/bash", "./scripts/entrypoint.sh"]
