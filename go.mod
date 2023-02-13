@@ -3,8 +3,9 @@ module github.com/rs401/letsgo
 go 1.17
 
 require (
+	github.com/disintegration/imaging v1.6.2
 	github.com/gin-contrib/sessions v0.0.3
-	github.com/gin-gonic/gin v1.7.4
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.3.0
@@ -19,7 +20,6 @@ require (
 	github.com/boj/redistore v0.0.0-20180917114910-cd5dcc76aeff // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
